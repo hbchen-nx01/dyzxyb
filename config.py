@@ -10,10 +10,21 @@ class Config:
     
     # 数据库配置 - 优先从环境变量读取DATABASE_URL
     # 支持PostgreSQL, MySQL, SQLite等数据库
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(BASE_DIR, "app.db")}')
+    # 对于Vercel Postgres，确保正确处理连接字符串
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     # 如果是PostgreSQL，确保添加sslmode参数
-    if SQLALCHEMY_DATABASE_URI.startswith('postgres://'):
-        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace('postgres://', 'postgresql://')
+    if SQLALCHEMY_DATABASE_URI:
+        if SQLALCHEMY_DATABASE_URI.startswith('postgres://'):
+            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace('postgres://', 'postgresql://')
+        # 确保添加sslmode=require参数，Vercel Postgres需要
+        if SQLALCHEMY_DATABASE_URI.startswith('postgresql://') and 'sslmode' not in SQLALCHEMY_DATABASE_URI:
+            if '?' in SQLALCHEMY_DATABASE_URI:
+                SQLALCHEMY_DATABASE_URI += '&sslmode=require'
+            else:
+                SQLALCHEMY_DATABASE_URI += '?sslmode=require'
+    else:
+        # 本地开发使用SQLite
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(BASE_DIR, "app.db")}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # 文件上传配置
