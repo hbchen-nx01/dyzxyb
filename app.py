@@ -13,15 +13,12 @@ app = Flask(__name__,
 app.config.from_object(Config)
 
 # 初始化数据库
-with app.app_context():
-    db.init_app(app)
-    # 创建所有表
-    db.create_all()
-    
-    # 确保上传目录存在
-    upload_folder = app.config['UPLOAD_FOLDER']
-    if not os.path.exists(upload_folder):
-        os.makedirs(upload_folder)
+db.init_app(app)
+
+# 确保上传目录存在
+upload_folder = app.config['UPLOAD_FOLDER']
+if not os.path.exists(upload_folder):
+    os.makedirs(upload_folder)
 
 # 注册路由蓝图
 from routes.honor_board import honor_board_bp
@@ -51,6 +48,10 @@ app.register_blueprint(health_bp, url_prefix='/health')
 @app.route('/')
 def index():
     """首页路由"""
+    # 在请求处理时创建表，适合无服务器环境
+    with app.app_context():
+        db.create_all()
+    
     # 获取任务状态统计
     status_counts = {
         'pending': WorkTask.query.filter_by(status='pending').count(),
