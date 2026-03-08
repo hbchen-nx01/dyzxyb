@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}添加光荣榜条目{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">添加光荣榜条目</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('honor_board.add_honor') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="employee_name" class="form-label">人员姓名 *</label>
+                            <input type="text" class="form-control" id="employee_name" name="employee_name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="award_type" class="form-label">奖励类型 *</label>
+                            <input type="text" class="form-control" id="award_type" name="award_type" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="award_content" class="form-label">奖励内容 *</label>
+                            <textarea class="form-control" id="award_content" name="award_content" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="award_date" class="form-label">获得时间 *</label>
+                            <input type="date" class="form-control" id="award_date" name="award_date" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image" class="form-label">上传图片</label>
+                            <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                            <div id="imageHelp" class="form-text">支持上传png、jpg、jpeg、gif格式的图片，最大16MB。</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('honor_board.honor_board_index') }}" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

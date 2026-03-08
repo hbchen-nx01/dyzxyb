@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}工作统计分析{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">工作统计分析</h1>
+            
+            <!-- 任务状态统计 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>任务状态统计</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>状态</th>
+                                        <th>数量</th>
+                                        <th>占比</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>未开始</td>
+                                        <td>{{ status_counts.pending }}</td>
+                                        <td>
+                                            {% set total = status_counts.pending + status_counts.in_progress + status_counts.completed %}
+                                            {% if total > 0 %}
+                                                {{ "{:.1f}".format(status_counts.pending / total * 100) }}%
+                                            {% else %}
+                                                0.0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>进行中</td>
+                                        <td>{{ status_counts.in_progress }}</td>
+                                        <td>
+                                            {% set total = status_counts.pending + status_counts.in_progress + status_counts.completed %}
+                                            {% if total > 0 %}
+                                                {{ "{:.1f}".format(status_counts.in_progress / total * 100) }}%
+                                            {% else %}
+                                                0.0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>已完成</td>
+                                        <td>{{ status_counts.completed }}</td>
+                                        <td>
+                                            {% set total = status_counts.pending + status_counts.in_progress + status_counts.completed %}
+                                            {% if total > 0 %}
+                                                {{ "{:.1f}".format(status_counts.completed / total * 100) }}%
+                                            {% else %}
+                                                0.0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>总计</th>
+                                        <th>{{ status_counts.pending + status_counts.in_progress + status_counts.completed }}</th>
+                                        <th>100%</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 人员工作量统计 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>人员工作量统计（按任务数量）</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <canvas id="workloadChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 任务完成趋势 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>任务完成趋势（最近30天）</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // 任务状态统计图表
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['未开始', '进行中', '已完成'],
+                datasets: [{
+                    data: [{{ status_counts.pending }}, {{ status_counts.in_progress }}, {{ status_counts.completed }}],
+                    backgroundColor: ['#ffc107', '#17a2b8', '#28a745'],
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round(value / total * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 人员工作量统计图表
+        const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+        const workloadChart = new Chart(workloadCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ personnel_workload.keys() | list | tojson }},
+                datasets: [{
+                    label: '任务数量',
+                    data: {{ personnel_workload.values() | list | tojson }},
+                    backgroundColor: '#007bff',
+                    borderColor: '#0056b3',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        // 任务完成趋势图表
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: {{ completed_tasks_by_date.keys() | list | tojson }},
+                datasets: [{
+                    label: '完成任务数',
+                    data: {{ completed_tasks_by_date.values() | list | tojson }},
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    borderColor: '#28a745',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

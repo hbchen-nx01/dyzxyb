@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">考勤异常管理</h1>
+    </div>
+
+    <!-- 考勤内部导航 -->
+    {% include 'components/attendance_nav.html' %}
+    
+    <!-- 考勤异常列表 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">考勤异常记录</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>员工</th>
+                            <th>考勤日期</th>
+                            <th>考勤状态</th>
+                            <th>上班时间</th>
+                            <th>下班时间</th>
+                            <th>备注</th>
+                            <th>记录时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exception in exceptions %}
+                        <tr>
+                            <td>{{ exception.employee.employee_id }} - {{ exception.employee.name }}</td>
+                            <td>{{ exception.attendance_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="badge badge-danger">{{ attendance_status_map.get(exception.status, exception.status) }}</span>
+                            </td>
+                            <td>{{ exception.check_in_time.strftime('%H:%M') if exception.check_in_time else '' }}</td>
+                            <td>{{ exception.check_out_time.strftime('%H:%M') if exception.check_out_time else '' }}</td>
+                            <td>{{ exception.notes or '' }}</td>
+                            <td>{{ exception.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

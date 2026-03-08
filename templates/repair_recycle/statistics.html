@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}修旧利废统计分析{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">修旧利废统计分析</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('repair_recycle.repair_recycle_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回台账列表
+                </a>
+            </div>
+            
+            <!-- 统计卡片 -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">总记录数</h5>
+                            <p class="card-text display-4">{{ total_records }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">总效益</h5>
+                            <p class="card-text display-4">¥{{ "%.2f"|format(total_benefit) }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% if total_records > 0 %}
+                    <div class="col-md-3">
+                        <div class="card text-white bg-info">
+                            <div class="card-body">
+                                <h5 class="card-title">平均每条效益</h5>
+                                <p class="card-text display-4">¥{{ "%.2f"|format(total_benefit / total_records) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- 图表区域 -->
+            <div class="row">
+                <!-- 按设备统计 -->
+                {% if equipment_benefits %}
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title">按设备统计效益</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="equipmentChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- 按月份统计 -->
+                {% if month_benefits %}
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title">按月份统计效益</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="monthChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- 按修复人员统计 -->
+            {% if person_benefits %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">按修复人员统计</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>修复人员</th>
+                                    <th>项目数量</th>
+                                    <th>总效益（元）</th>
+                                    <th>平均效益（元/项）</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repair_person, count, benefit in person_benefits %}
+                                    <tr>
+                                        <td>{{ repair_person }}</td>
+                                        <td>{{ count }}</td>
+                                        <td>¥{{ "%.2f"|format(benefit) }}</td>
+                                        <td>¥{{ "%.2f"|format(benefit / count) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- 按设备统计表格 -->
+            {% if equipment_benefits %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">按设备统计详细数据</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>设备名称</th>
+                                    <th>项目数量</th>
+                                    <th>总效益（元）</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for equipment_name, count, benefit in equipment_benefits %}
+                                    <tr>
+                                        <td>{{ equipment_name }}</td>
+                                        <td>{{ count }}</td>
+                                        <td>¥{{ "%.2f"|format(benefit) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 按设备统计图表
+        {% if equipment_benefits %}
+            const equipmentCtx = document.getElementById('equipmentChart').getContext('2d');
+            const equipmentChart = new Chart(equipmentCtx, {
+                type: 'bar',
+                data: {
+                    labels: [{% for equipment_name, count, benefit in equipment_benefits %}'{{ equipment_name }}', {% endfor %}],
+                    datasets: [{
+                        label: '效益（元）',
+                        data: [{% for equipment_name, count, benefit in equipment_benefits %}{{ benefit }}, {% endfor %}],
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '效益（元）'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '设备名称'
+                            }
+                        }
+                    }
+                }
+            });
+        {% endif %}
+        
+        // 按月份统计图表
+        {% if month_benefits %}
+            const monthCtx = document.getElementById('monthChart').getContext('2d');
+            const monthChart = new Chart(monthCtx, {
+                type: 'line',
+                data: {
+                    labels: [{% for month, count, benefit in month_benefits %}'{{ month }}', {% endfor %}],
+                    datasets: [{
+                        label: '效益（元）',
+                        data: [{% for month, count, benefit in month_benefits %}{{ benefit }}, {% endfor %}],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '项目数量',
+                        data: [{% for month, count, benefit in month_benefits %}{{ count }}, {% endfor %}],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '效益（元）'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '项目数量'
+                            },
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '月份'
+                            }
+                        }
+                    }
+                }
+            });
+        {% endif %}
+    </script>
+{% endblock %}

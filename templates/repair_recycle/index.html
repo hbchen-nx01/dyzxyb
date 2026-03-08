@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}修旧利废台账{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">修旧利废台账</h1>
+            
+            <!-- 添加记录按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('repair_recycle.add_repair_recycle') }}" class="btn btn-success">
+                    <i class="bi bi-plus"></i> 添加记录
+                </a>
+                <a href="{{ url_for('repair_recycle.repair_recycle_statistics') }}" class="btn btn-primary">
+                    <i class="bi bi-bar-chart"></i> 统计分析
+                </a>
+            </div>
+            
+            <!-- 搜索和筛选 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{{ url_for('repair_recycle.repair_recycle_index') }}">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label for="equipment_name" class="form-label">设备</label>
+                                <input type="text" name="equipment_name" id="equipment_name" class="form-control" value="{{ selected_equipment_name or '' }}" placeholder="设备名称或编号">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="repair_person" class="form-label">修复人员</label>
+                                <input type="text" name="repair_person" id="repair_person" class="form-control" value="{{ selected_person or '' }}" placeholder="修复人员姓名">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="start_date" class="form-label">开始日期</label>
+                                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ selected_start_date or '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="end_date" class="form-label">结束日期</label>
+                                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ selected_end_date or '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">搜索</button>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <a href="{{ url_for('repair_recycle.repair_recycle_index') }}" class="btn btn-secondary w-100">重置</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 记录列表 -->
+            {% if records %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>项目名称</th>
+                            <th>设备</th>
+                            <th>修复日期</th>
+                            <th>修复人员</th>
+                            <th>修复前价值</th>
+                            <th>修复后价值</th>
+                            <th>效益</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record.project_name }}</td>
+                                <td>{{ record.equipment_name }}</td>
+                                <td>{{ record.repair_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ record.repair_person }}</td>
+                                <td>¥{{ "%.2f"|format(record.before_value) }}</td>
+                                <td>¥{{ "%.2f"|format(record.after_value) }}</td>
+                                <td>¥{{ "%.2f"|format(record.benefit) }}</td>
+                                <td>
+                                    <a href="{{ url_for('repair_recycle.repair_recycle_detail', id=record.id) }}" class="btn btn-info btn-sm me-1">查看</a>
+                                    <a href="{{ url_for('repair_recycle.edit_repair_recycle', id=record.id) }}" class="btn btn-warning btn-sm me-1">编辑</a>
+                                    <form action="{{ url_for('repair_recycle.delete_repair_recycle', id=record.id) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这条记录吗？')">删除</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- 分页 -->
+                {% if pagination %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('repair_recycle.repair_recycle_index', page=pagination.prev_num, equipment_id=selected_equipment, repair_person=selected_person, start_date=selected_start_date, end_date=selected_end_date) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if pagination.page == page_num %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('repair_recycle.repair_recycle_index', page=page_num, equipment_id=selected_equipment, repair_person=selected_person, start_date=selected_start_date, end_date=selected_end_date) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('repair_recycle.repair_recycle_index', page=pagination.next_num, equipment_id=selected_equipment, repair_person=selected_person, start_date=selected_start_date, end_date=selected_end_date) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    暂无修旧利废记录
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

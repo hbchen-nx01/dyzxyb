@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}添加培训证书{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加培训证书</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.training_plan_detail', id=plan.id) }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回详情
+                </a>
+            </div>
+            
+            <!-- 培训计划信息 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>{{ plan.title }}</h5>
+                    <p class="text-muted">培训时间：{{ plan.start_date.strftime('%Y-%m-%d %H:%M') }} 至 {{ plan.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+            
+            <!-- 添加证书表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('training.add_training_certificate', plan_id=plan.id) }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="employee_id" class="form-label">员工 <span class="text-danger">*</span></label>
+                                <select name="employee_id" id="employee_id" class="form-select" required>
+                                    <option value="">选择员工</option>
+                                    {% for participant in participants %}
+                                        <option value="{{ participant.employee.id }}">{{ participant.employee.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="certificate_number" class="form-label">证书编号 <span class="text-danger">*</span></label>
+                                <input type="text" name="certificate_number" id="certificate_number" class="form-control" required placeholder="请输入证书编号">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="issue_date" class="form-label">颁发日期 <span class="text-danger">*</span></label>
+                                <input type="date" name="issue_date" id="issue_date" class="form-control" required value="{{ today }}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="valid_until" class="form-label">有效期至</label>
+                                <input type="date" name="valid_until" id="valid_until" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">颁发证书</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 设置默认日期为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('issue_date').value = today;
+        });
+    </script>
+{% endblock %}

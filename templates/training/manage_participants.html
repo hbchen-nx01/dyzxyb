@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}管理参与人员{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">管理参与人员</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.training_plan_detail', id=plan.id) }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回详情
+                </a>
+            </div>
+            
+            <!-- 培训计划信息 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>{{ plan.title }}</h5>
+                    <p class="text-muted">培训时间：{{ plan.start_date.strftime('%Y-%m-%d %H:%M') }} 至 {{ plan.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+            
+            <!-- 参与人员选择表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('training.manage_participants', plan_id=plan.id) }}">
+                        <div class="mb-3">
+                            <label class="form-label">选择参与人员</label>
+                            <div class="row g-2">
+                                {% for employee in all_employees %}
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" name="employee_ids" value="{{ employee.id }}" class="form-check-input" {% if employee.id in participant_employee_ids %}checked{% endif %} id="employee{{ employee.id }}">
+                                            <label class="form-check-label" for="employee{{ employee.id }}">{{ employee.name }}</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">保存参与人员</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

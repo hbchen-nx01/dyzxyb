@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}首页{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4 text-center">班组管理系统</h1>
+            <p class="text-center mb-5">宁夏石化公司电仪中心仪表四班</p>
+            
+            <!-- 模块进入按钮 -->
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('honor_board.honor_board_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-trophy display-1 text-primary"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">光荣榜</h5>
+                                <p class="card-text">查看和管理班组人员的奖励和表彰信息</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('employee.employee_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-people display-1 text-success"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">员工信息管理</h5>
+                                <p class="card-text">维护班组人员的基本信息、技能等级、培训经历和资质证书</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('health.health_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-heart-pulse display-1 text-danger"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">员工情绪与健康管理</h5>
+                                <p class="card-text">记录员工情绪状态、身体健康状况和心情日记，评估工作适配性</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('experience.experience_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-book display-1 text-info"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">经验分享</h5>
+                                <p class="card-text">分享维修技巧、故障案例、技术分享等经验文章</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('work_task.work_task_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-calendar-check display-1 text-warning"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">每日工作安排</h5>
+                                <p class="card-text">发布工作任务、跟踪任务状态、填写工作日报</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('attendance.index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-clock display-1 text-primary"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">考勤管理</h5>
+                                <p class="card-text">记录员工考勤信息、请假加班审批、生成考勤报表</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('analytical_maintenance.dashboard') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-thermometer-half display-1 text-success"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">仪表维护</h5>
+                                <p class="card-text">分析仪表预防性维护计划管理，确保仪表测量精度和设备寿命</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('fault_handling.fault_record_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">设备故障处理</h5>
+                                <p class="card-text">记录故障信息、处理过程、统计分析和案例查询</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('repair_recycle.repair_recycle_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-recycle display-1 text-success"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">修旧利废台账</h5>
+                                <p class="card-text">记录修旧利废项目、修复前后对比和效益统计</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('training.training_plan_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-book-half display-1 text-primary"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">班组培训计划</h5>
+                                <p class="card-text">制定培训计划、管理参与人员和评估效果</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <a href="{{ url_for('document_management.document_management_index') }}" class="card text-decoration-none text-dark h-100">
+                        <div class="card-body">
+                            <i class="bi bi-file-earmark display-1 text-info"></i>
+                            <div class="card-content">
+                                <h5 class="card-title">文档管理</h5>
+                                <p class="card-text">上传、管理和下载各类文档资源</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 每日工作任务 -->
+            <div class="mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>每日工作任务 <a href="{{ url_for('work_task.work_task_index') }}" class="float-right text-sm text-primary">查看全部</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- 任务状态统计 -->
+                            <div class="col-md-4">
+                                <h6 class="mb-3">任务状态</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">未开始</span>
+                                    <span class="font-weight-bold">{{ status_counts.pending }}</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    {% set total = status_counts.pending + status_counts.in_progress + status_counts.completed %}
+                                    <div class="progress-bar bg-warning" style="width: {{ 100 * status_counts.pending / total if total > 0 else 0 }}%" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">进行中</span>
+                                    <span class="font-weight-bold">{{ status_counts.in_progress }}</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar bg-info" style="width: {{ 100 * status_counts.in_progress / total if total > 0 else 0 }}%" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">已完成</span>
+                                    <span class="font-weight-bold">{{ status_counts.completed }}</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar bg-success" style="width: {{ 100 * status_counts.completed / total if total > 0 else 0 }}%" role="progressbar"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <span class="text-muted">总计</span>
+                                    <span class="font-weight-bold">{{ total }}</span>
+                                </div>
+                            </div>
+                            <!-- 最近任务列表 -->
+                            <div class="col-md-8">
+                                <h6 class="mb-3">最近任务</h6>
+                                {% if recent_tasks %}
+                                    <ul class="list-group">
+                                        {% for task in recent_tasks %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-0">{{ task.title }}</h6>
+                                                    <small class="text-muted">
+                                                        负责人: {{ task.assigned_to }} | 
+                                                        状态: {% if task.status == 'pending' %}未开始{% elif task.status == 'in_progress' %}进行中{% else %}已完成{% endif %} | 
+                                                        创建: {{ task.created_at.strftime('%Y-%m-%d') }}
+                                                    </small>
+                                                </div>
+                                                <span class="badge 
+                                                    {% if task.status == 'pending' %}badge-warning
+                                                    {% elif task.status == 'in_progress' %}badge-info
+                                                    {% else %}badge-success{% endif %}">
+                                                    {% if task.status == 'pending' %}未开始{% elif task.status == 'in_progress' %}进行中{% else %}已完成{% endif %}
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">暂无工作任务</p>
+                                {% endif %}
+                                <a href="{{ url_for('work_task.work_task_index') }}" class="btn btn-sm btn-primary mt-3">查看全部任务</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 系统说明 -->
+            <div class="mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>系统说明</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>本系统为宁夏石化公司电仪中心仪表四班的班组管理系统，目前包含以下功能模块：</p>
+                        <ul>
+                            <li><strong>光荣榜</strong>：显示班组人员的奖励和表彰信息，支持添加、编辑、删除和查询</li>
+                            <li><strong>员工信息管理</strong>：维护班组人员的基本信息、技能等级、培训经历和资质证书</li>
+                            <li><strong>经验分享</strong>：提供经验文章发布平台，支持文章分类、评论、点赞和多媒体内容上传</li>
+                            <li><strong>每日工作安排</strong>：发布工作任务、支持任务分配、状态跟踪、工作日报填写和工作统计分析</li>
+                            <li><strong>设备故障处理</strong>：记录设备故障信息、处理过程和解决方案，支持故障类型统计分析、案例查询参考和处理时间跟踪</li>
+                            <li><strong>修旧利废台账</strong>：记录修旧利废项目信息、修复前后的状态和价值，支持按时间、设备类型、修复人员查询，支持效益统计和图片对比展示</li>
+                            <li><strong>班组培训计划</strong>：制定班组培训计划、记录培训参与人员和考核结果、支持培训资料上传和共享、支持培训效果评估和证书管理</li>
+                            <li><strong>考勤管理</strong>：记录员工考勤信息、支持手动和自动考勤、节假日自动处理、请假加班审批流程、考勤报表生成和统计分析</li>
+                            <li><strong>文档管理</strong>：上传、管理和下载各类文档资源，支持文档分类、查询和筛选</li>
+                        </ul>
+                    <p>系统采用模块化设计，便于后续扩展其他功能模块。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

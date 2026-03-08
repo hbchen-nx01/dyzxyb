@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}报告故障{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">报告故障</h1>
+            
+            <!-- 添加故障记录表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('fault_handling.add_fault_record') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="equipment_id" class="form-label">设备 <span class="text-danger">*</span></label>
+                            <select name="equipment_id" id="equipment_id" class="form-select" required>
+                                {% for equipment in equipments %}
+                                    <option value="{{ equipment.id }}">{{ equipment.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fault_phenomenon" class="form-label">故障现象 <span class="text-danger">*</span></label>
+                            <textarea name="fault_phenomenon" id="fault_phenomenon" class="form-control" rows="4" required></textarea>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="occurrence_date" class="form-label">故障发生日期 <span class="text-danger">*</span></label>
+                                <input type="date" name="occurrence_date" id="occurrence_date" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="occurrence_time" class="form-label">故障发生时间 <span class="text-danger">*</span></label>
+                                <input type="time" name="occurrence_time" id="occurrence_time" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reporter" class="form-label">报告人 <span class="text-danger">*</span></label>
+                            <input type="text" name="reporter" id="reporter" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fault_type" class="form-label">故障类型</label>
+                            <input type="text" name="fault_type" id="fault_type" class="form-control" placeholder="例如：电气故障、机械故障等">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fault_image" class="form-label">故障图片</label>
+                            <input type="file" name="fault_image" id="fault_image" class="form-control" accept="image/*">
+                            <div class="form-text">支持上传jpg、jpeg、png、gif格式图片，大小不超过16MB</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('fault_handling.fault_record_index') }}" class="btn btn-secondary me-2">取消</a>
+                            <button type="submit" class="btn btn-primary">提交故障报告</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

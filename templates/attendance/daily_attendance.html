@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">日考勤管理</h1>
+        <div>
+            <form action="" method="get" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="month" class="sr-only">月份</label>
+                    <input type="month" class="form-control" id="month" name="month" value="{{ current_month }}" onchange="this.form.submit()">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 考勤内部导航 -->
+    {% include 'components/attendance_nav.html' %}
+    
+    <!-- 操作按钮 -->
+    <div class="mb-4">
+        <form action="{{ url_for('attendance.auto_fill_attendance', year=current_month.split('-')[0], month=current_month.split('-')[1]) }}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-success mr-2" onclick="return confirm('确定要自动填充节假日和周末吗？')">
+                <i class="fas fa-magic mr-1"></i> 自动填充节假日和周末
+            </button>
+        </form>
+    </div>
+
+    <!-- 考勤表格 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">{{ current_month }} 考勤记录</h6>
+            <button id="save-order-btn" class="btn btn-primary btn-sm" disabled>
+                <i class="bi bi-save"></i> 保存顺序
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"></th>
+                            <th>员工编号</th>
+                            <th>员工姓名</th>
+                            {% for date in dates %}
+                            <th>
+                                <div>{{ date.day }}日</div>
+                                <div class="text-xs" style="color: {{ 'red' if date.weekday() in [5, 6] else 'gray' }}">
+                                    {{ ['一', '二', '三', '四', '五', '六', '日'][date.weekday()] }}
+                                </div>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody id="employee-list" data-sort-url="{{ url_for('employee.update_employee_order') }}">
+                        {% for employee in employees %}
+                        <tr draggable="true" data-employee-id="{{ employee.id }}">
+                            <td>
+                                <i class="bi bi-arrows-move text-muted"></i>
+                            </td>
+                            <td>{{ employee.employee_id }}</td>
+                            <td>{{ employee.name }}</td>
+                            {% for date in dates %}
+                            <td>
+                                {% set record = attendance_dict.get((employee.id, date)) %}
+                                {% set status = record.status if record else '' %}
+                                <a href="{{ url_for('attendance.edit_daily_attendance', year=date.year, month=date.month, day=date.day) }}" 
+                                   class="btn btn-sm {% if status == '1' %}btn-success{% elif status == '休' %}btn-secondary{% elif status == '旷' %}btn-danger{% else %}btn-info{% endif %} btn-block" 
+                                   style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                    {{ status }}
+                                </a>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 调整顺序的JavaScript -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const tableBody = document.getElementById('employee-list');
+                    const saveBtn = document.getElementById('save-order-btn');
+                    let draggedElement = null;
+                    let isOrderChanged = false;
+
+                    // 拖动开始
+                    tableBody.addEventListener('dragstart', function(e) {
+                        if (e.target.tagName === 'TR') {
+                            draggedElement = e.target;
+                            setTimeout(function() {
+                                draggedElement.classList.add('opacity-50');
+                            }, 0);
+                        }
+                    });
+
+                    // 拖动结束
+                    tableBody.addEventListener('dragend', function(e) {
+                        if (e.target.tagName === 'TR') {
+                            e.target.classList.remove('opacity-50');
+                            draggedElement = null;
+                        }
+                    });
+
+                    // 拖动经过
+                    tableBody.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        const afterElement = getDragAfterElement(tableBody, e.clientY);
+                        if (draggedElement === afterElement) {
+                            return;
+                        }
+                        if (afterElement == null) {
+                            tableBody.appendChild(draggedElement);
+                        } else {
+                            tableBody.insertBefore(draggedElement, afterElement);
+                        }
+                        isOrderChanged = true;
+                        saveBtn.disabled = false;
+                    });
+
+                    // 获取拖动元素应该插入的位置
+                    function getDragAfterElement(container, y) {
+                        const draggableElements = [...container.querySelectorAll('tr:not(.opacity-50)')];
+                        return draggableElements.reduce((closest, child) => {
+                            const box = child.getBoundingClientRect();
+                            const offset = y - box.top - box.height / 2;
+                            if (offset < 0 && offset > closest.offset) {
+                                return { offset: offset, element: child };
+                            } else {
+                                return closest;
+                            }
+                        }, { offset: Number.NEGATIVE_INFINITY }).element;
+                    }
+
+                    // 保存顺序
+                    saveBtn.addEventListener('click', function() {
+                        if (!isOrderChanged) return;
+
+                        const employeeRows = tableBody.querySelectorAll('tr');
+                        const orderData = [];
+
+                        employeeRows.forEach((row, index) => {
+                            const employeeId = row.getAttribute('data-employee-id');
+                            orderData.push({
+                                id: parseInt(employeeId),
+                                sort_order: index
+                            });
+                        });
+
+                        // 发送更新请求
+                        fetch(tableBody.getAttribute('data-sort-url'), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify(orderData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('员工顺序更新成功！');
+                                isOrderChanged = false;
+                                saveBtn.disabled = true;
+                                // 刷新页面以更新排序
+                                location.reload();
+                            } else {
+                                alert('更新失败：' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('更新失败，请稍后重试');
+                        });
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

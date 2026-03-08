@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑健康记录{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">编辑健康记录</h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>健康记录信息</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('health.edit_health_record', record_id=record.id) }}">
+                        <div class="mb-3">
+                            <label for="employee_id" class="form-label">员工姓名</label>
+                            <select class="form-select" id="employee_id" name="employee_id" required>
+                                {% for employee in employees %}
+                                    <option value="{{ employee.id }}" {% if employee.id == record.employee_id %}selected{% endif %}>{{ employee.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="record_date" class="form-label">记录日期</label>
+                            <input type="date" class="form-control" id="record_date" name="record_date" required value="{{ record.record_date.strftime('%Y-%m-%d') }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="mental_state" class="form-label">情绪状态 (0-10分)</label>
+                            <div class="d-flex align-items-center mb-2">
+                                <input type="range" class="form-range flex-grow-1 me-3" min="0" max="10" id="mental_state" name="mental_state" value="{{ record.mental_state }}" oninput="updateMentalState(this.value)">
+                                <span id="mentalStateValue" class="badge bg-primary">{{ record.mental_state }}</span>
+                                <span id="mentalStateLevel" class="ms-1">一般</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div id="mentalStateBar" class="progress-bar bg-primary" role="progressbar" style="width: {{ record.mental_state * 10 }}%;" aria-valuenow="{{ record.mental_state }}" aria-valuemin="0" aria-valuemax="10"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="physical_health" class="form-label">身体健康 (0-10分)</label>
+                            <div class="d-flex align-items-center mb-2">
+                                <input type="range" class="form-range flex-grow-1 me-3" min="0" max="10" id="physical_health" name="physical_health" value="{{ record.physical_health }}" oninput="updatePhysicalHealth(this.value)">
+                                <span id="physicalHealthValue" class="badge bg-success">{{ record.physical_health }}</span>
+                                <span id="physicalHealthLevel" class="ms-1">一般</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div id="physicalHealthBar" class="progress-bar bg-success" role="progressbar" style="width: {{ record.physical_health * 10 }}%;" aria-valuenow="{{ record.physical_health }}" aria-valuemin="0" aria-valuemax="10"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">工作适配性</label>
+                            <div class="d-flex align-items-center">
+                                <span id="workSuitability" class="badge bg-{% if record.work_suitability %}success{% else %}danger{% endif %}">{% if record.work_suitability %}适合工作{% else %}不适合工作{% endif %}</span>
+                                <input type="hidden" id="work_suitability" name="work_suitability" value="{% if record.work_suitability %}true{% else %}false{% endif %}">
+                            </div>
+                            <small class="text-muted">注：情绪状态≤2分或身体健康≤2分时，自动标记为"不适合工作"</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="mood_diary" class="form-label">心情日记</label>
+                            <textarea class="form-control" id="mood_diary" name="mood_diary" rows="3" placeholder="请输入今日心情...">{{ record.mood_diary }}</textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="window.history.back()">取消</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function getHealthInfo(score) {
+            if (score <= 2) {
+                return { level: "极差", color: "danger" };
+            } else if (score <= 4) {
+                return { level: "较差", color: "warning" };
+            } else if (score <= 6) {
+                return { level: "一般", color: "info" };
+            } else if (score <= 8) {
+                return { level: "良好", color: "primary" };
+            } else {
+                return { level: "极佳", color: "success" };
+            }
+        }
+        
+        function updateMentalState(value) {
+            const mentalStateValue = document.getElementById('mentalStateValue');
+            const mentalStateLevel = document.getElementById('mentalStateLevel');
+            const mentalStateBar = document.getElementById('mentalStateBar');
+            
+            mentalStateValue.textContent = value;
+            
+            const healthInfo = getHealthInfo(parseInt(value));
+            mentalStateValue.className = `badge bg-${healthInfo.color}`;
+            mentalStateLevel.textContent = healthInfo.level;
+            mentalStateBar.className = `progress-bar bg-${healthInfo.color}`;
+            mentalStateBar.style.width = `${value * 10}%`;
+            mentalStateBar.setAttribute('aria-valuenow', value);
+            
+            updateWorkSuitability();
+        }
+        
+        function updatePhysicalHealth(value) {
+            const physicalHealthValue = document.getElementById('physicalHealthValue');
+            const physicalHealthLevel = document.getElementById('physicalHealthLevel');
+            const physicalHealthBar = document.getElementById('physicalHealthBar');
+            
+            physicalHealthValue.textContent = value;
+            
+            const healthInfo = getHealthInfo(parseInt(value));
+            physicalHealthValue.className = `badge bg-${healthInfo.color}`;
+            physicalHealthLevel.textContent = healthInfo.level;
+            physicalHealthBar.className = `progress-bar bg-${healthInfo.color}`;
+            physicalHealthBar.style.width = `${value * 10}%`;
+            physicalHealthBar.setAttribute('aria-valuenow', value);
+            
+            updateWorkSuitability();
+        }
+        
+        function updateWorkSuitability() {
+            const mentalState = parseInt(document.getElementById('mental_state').value);
+            const physicalHealth = parseInt(document.getElementById('physical_health').value);
+            const workSuitability = document.getElementById('workSuitability');
+            const workSuitabilityHidden = document.getElementById('work_suitability');
+            
+            if (mentalState <= 2 || physicalHealth <= 2) {
+                workSuitability.textContent = "不适合工作";
+                workSuitability.className = "badge bg-danger";
+                workSuitabilityHidden.value = "false";
+            } else {
+                workSuitability.textContent = "适合工作";
+                workSuitability.className = "badge bg-success";
+                workSuitabilityHidden.value = "true";
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化显示
+            updateMentalState({{ record.mental_state }});
+            updatePhysicalHealth({{ record.physical_health }});
+        });
+    </script>
+{% endblock %}

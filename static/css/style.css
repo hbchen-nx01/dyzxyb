@@ -1,0 +1,88 @@
+/* 基础样式 */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* 光荣榜图片样式 */
+.honor-image {
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.honor-image:hover {
+    transform: scale(1.02);
+}
+
+/* 卡片样式 */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 首页功能模块卡片样式 */
+.row.justify-content-center .card {
+    /* 将卡片缩小为原来的0.8倍 */
+    transform: scale(0.8);
+    transform-origin: center;
+    margin-bottom: 25px; /* 调整卡片间距 */
+    margin-top: 25px;
+}
+
+/* 首页功能模块卡片内容样式 */
+.row.justify-content-center .card-body {
+    padding: 1.5rem;
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+
+/* 首页功能模块图标样式 */
+.row.justify-content-center .card-body .bi {
+    font-size: 3rem; /* 保持图标大小 */
+    margin-bottom: 0;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* 首页功能模块卡片内容容器 */
+.row.justify-content-center .card-content {
+    flex: 1;
+}
+
+/* 首页功能模块卡片标题样式 */
+.row.justify-content-center .card-title {
+    font-size: 1rem; /* 适当缩小文字大小 */
+    margin-bottom: 0.5rem;
+}
+
+/* 首页功能模块卡片文本样式 */
+.row.justify-content-center .card-text {
+    font-size: 0.875rem; /* 适当缩小文字大小 */
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+/* 表单样式 */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 页脚样式 */
+.footer {
+    margin-top: 2rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .honor-image {
+        height: 150px;
+    }
+}

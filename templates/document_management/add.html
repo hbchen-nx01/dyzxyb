@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}上传文档{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mb-4">上传文档</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('document_management.add_document') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="title">文档标题</label>
+                        <input type="text" class="form-control" id="title" name="title" required placeholder="请输入文档标题">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_id">文档分类</label>
+                        <select class="form-control" id="category_id" name="category_id" required>
+                            <option value="">请选择分类</option>
+                            {% for category in categories if not category.parent_id %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% for subcategory in categories if subcategory.parent_id == category.id %}
+                                    <option value="{{ subcategory.id }}">&nbsp;&nbsp;└─ {{ subcategory.name }}</option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="uploader">上传人</label>
+                        <input type="text" class="form-control" id="uploader" name="uploader" required placeholder="请输入上传人姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="document">选择文档</label>
+                        <input type="file" class="form-control-file" id="document" name="document" required>
+                        <small class="form-text text-muted">支持的文件类型：pdf, doc, docx, xls, xlsx, ppt, pptx, txt, zip, rar</small>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary mr-2">上传</button>
+                        <a href="{{ url_for('document_management.document_management_index') }}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

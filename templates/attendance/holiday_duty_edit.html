@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">编辑值班安排 - {{ holiday.name }}</h1>
+        <a href="{{ url_for('attendance.holiday_duty_list', holiday_id=holiday.id) }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i> 返回值班安排列表
+        </a>
+    </div>
+
+    <!-- 编辑值班安排表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">值班人员信息</h6>
+        </div>
+        <div class="card-body">
+            <form action="" method="post">
+                <div class="form-row">
+                    <!-- 节假日信息 -->
+                    <div class="form-group col-md-12">
+                        <div class="alert alert-info" role="alert">
+                            <strong>节假日：</strong> {{ holiday.name }} ({{ holiday.holiday_date.strftime('%Y-%m-%d') }})
+                        </div>
+                    </div>
+                    
+                    <!-- 值班人员 -->
+                    <div class="form-group col-md-6">
+                        <label for="employee_id">值班人员</label>
+                        <select class="form-control" id="employee_id" name="employee_id" required>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}" {% if employee.id == duty.employee_id %}selected{% endif %}>{{ employee.name }} ({{ employee.position }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- 值班时段 -->
+                    <div class="form-group col-md-6">
+                        <label for="duty_time">值班时段</label>
+                        <select class="form-control" id="duty_time" name="duty_time" required>
+                            <option value="白班" {% if duty.duty_time == '白班' %}selected{% endif %}>白班</option>
+                            <option value="夜班" {% if duty.duty_time == '夜班' %}selected{% endif %}>夜班</option>
+                            <option value="全天" {% if duty.duty_time == '全天' %}selected{% endif %}>全天</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 联系方式 -->
+                    <div class="form-group col-md-12">
+                        <label for="contact_info">联系方式</label>
+                        <input type="text" class="form-control" id="contact_info" name="contact_info" required placeholder="请输入值班人员联系方式" value="{{ duty.contact_info }}">
+                    </div>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save mr-2"></i> 更新值班安排
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

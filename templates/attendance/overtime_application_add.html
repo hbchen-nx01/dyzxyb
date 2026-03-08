@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">提交加班申请</h1>
+        <a href="{{ url_for('attendance.overtime_application_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 加班申请表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">加班申请信息</h6>
+        </div>
+        <div class="card-body">
+            <form action="" method="post">
+                <div class="form-row">
+                    <!-- 员工选择 -->
+                    <div class="form-group col-md-6">
+                        <label for="employee_id">员工</label>
+                        <select class="form-control" id="employee_id" name="employee_id" required>
+                            <option value="">请选择员工</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.employee_id }} - {{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- 加班日期 -->
+                    <div class="form-group col-md-6">
+                        <label for="overtime_date">加班日期</label>
+                        <input type="date" class="form-control" id="overtime_date" name="overtime_date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <!-- 开始时间 -->
+                    <div class="form-group col-md-6">
+                        <label for="start_time">开始时间</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" required>
+                    </div>
+                    
+                    <!-- 结束时间 -->
+                    <div class="form-group col-md-6">
+                        <label for="end_time">结束时间</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <!-- 加班时长 -->
+                    <div class="form-group col-md-6">
+                        <label for="duration">加班时长（小时）</label>
+                        <input type="number" step="0.5" class="form-control" id="duration" name="duration" required min="0.5" max="24">
+                    </div>
+                </div>
+                
+                <!-- 加班原因 -->
+                <div class="form-group">
+                    <label for="reason">加班原因</label>
+                    <textarea class="form-control" id="reason" name="reason" rows="4" required></textarea>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane mr-2"></i> 提交申请
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 加班时长自动计算功能
+    (function() {
+        // 直接获取DOM元素，不依赖DOMContentLoaded，因为脚本在页面底部加载
+        const startTimeInput = document.getElementById('start_time');
+        const endTimeInput = document.getElementById('end_time');
+        const durationInput = document.getElementById('duration');
+        let isManualEdit = false;
+
+        // 确保元素存在
+        if (!startTimeInput || !endTimeInput || !durationInput) {
+            console.error('无法找到所需的DOM元素');
+            return;
+        }
+
+        // 监听时长输入框的手动编辑
+        durationInput.addEventListener('input', function() {
+            isManualEdit = true;
+        });
+
+        // 计算加班时长
+        function calculateDuration() {
+            // 如果用户手动编辑过时长，则不再自动计算
+            if (isManualEdit) {
+                return;
+            }
+
+            const startTime = startTimeInput.value;
+            const endTime = endTimeInput.value;
+
+            if (startTime && endTime) {
+                try {
+                    // 将时间字符串转换为分钟数
+                    const [startHours, startMinutes] = startTime.split(':').map(Number);
+                    const [endHours, endMinutes] = endTime.split(':').map(Number);
+                    
+                    // 计算总分钟数差
+                    const startTotalMinutes = startHours * 60 + startMinutes;
+                    const endTotalMinutes = endHours * 60 + endMinutes;
+                    
+                    // 计算时长（小时）
+                    const durationHours = (endTotalMinutes - startTotalMinutes) / 60;
+                    
+                    // 只允许正数时长
+                    if (durationHours > 0) {
+                        // 格式化为0.5小时的倍数
+                        const formattedDuration = Math.round(durationHours * 2) / 2;
+                        durationInput.value = formattedDuration;
+                    } else {
+                        durationInput.value = '';
+                    }
+                } catch (error) {
+                    console.error('计算时长时出错:', error);
+                }
+            }
+        }
+
+        // 监听开始时间和结束时间的变化，使用input事件确保实时计算
+        startTimeInput.addEventListener('input', calculateDuration);
+        endTimeInput.addEventListener('input', calculateDuration);
+        startTimeInput.addEventListener('change', calculateDuration);
+        endTimeInput.addEventListener('change', calculateDuration);
+        
+        // 初始计算
+        calculateDuration();
+        
+        console.log('加班时长自动计算功能已初始化');
+    })();
+</script>
+{% endblock %}

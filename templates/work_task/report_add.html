@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}添加工作日报{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4 text-center">添加工作日报</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ url_for('work_task.add_work_report', task_id=task.id) }}" method="post">
+                        <div class="mb-3">
+                            <label for="task_title" class="form-label">关联任务</label>
+                            <input type="text" class="form-control" id="task_title" value="{{ task.title }}" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="report_date" class="form-label">报告日期</label>
+                            <input type="date" class="form-control" id="report_date" name="report_date" value="{{ now.strftime('%Y-%m-%d') }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">日报内容 *</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="author" class="form-label">报告作者 *</label>
+                            <input type="text" class="form-control" id="author" name="author" required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('work_task.work_task_detail', id=task.id) }}" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary">提交日报</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 获取当前日期
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const today = `${year}-${month}-${day}`;
+        
+        // 设置默认日期
+        document.getElementById('report_date').value = today;
+    </script>
+{% endblock %}

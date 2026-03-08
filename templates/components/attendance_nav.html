@@ -1,0 +1,94 @@
+<!-- 考勤管理内部导航 -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h6 class="mb-0">考勤功能导航</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- 日考勤管理 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.daily_attendance') }}" class="d-block p-3 border border-primary rounded bg-light hover:bg-primary hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-calendar fa-2x text-primary mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-primary">日考勤管理</div>
+                            <div class="text-sm text-muted">记录和管理每日考勤</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- 请假申请 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.leave_application_list') }}" class="d-block p-3 border border-success rounded bg-light hover:bg-success hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-calendar-times fa-2x text-success mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-success">请假申请</div>
+                            <div class="text-sm text-muted">提交和审批请假</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- 加班申请 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.overtime_application_list') }}" class="d-block p-3 border border-info rounded bg-light hover:bg-info hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock fa-2x text-info mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-info">加班申请</div>
+                            <div class="text-sm text-muted">提交和审批加班</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- 节假日管理 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.holiday_list') }}" class="d-block p-3 border border-warning rounded bg-light hover:bg-warning hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star fa-2x text-warning mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-warning">节假日管理</div>
+                            <div class="text-sm text-muted">管理节假日设置</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- 考勤报表 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.attendance_report') }}" class="d-block p-3 border border-secondary rounded bg-light hover:bg-secondary hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-excel fa-2x text-secondary mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-secondary">考勤报表</div>
+                            <div class="text-sm text-muted">生成和导出考勤报表</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- 考勤统计 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.attendance_statistics') }}" class="d-block p-3 border border-indigo rounded bg-light hover:bg-indigo hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chart-bar fa-2x text-indigo mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-indigo">考勤统计</div>
+                            <div class="text-sm text-muted">统计和分析考勤数据</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- 考勤异常 -->
+            <div class="col-xl-3 col-md-6 mb-3">
+                <a href="{{ url_for('attendance.attendance_exceptions') }}" class="d-block p-3 border border-danger rounded bg-light hover:bg-danger hover:text-white transition-all duration-200">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mr-3"></i>
+                        <div>
+                            <div class="font-weight-bold text-danger">考勤异常</div>
+                            <div class="text-sm text-muted">查询和处理考勤异常</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

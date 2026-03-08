@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}故障统计分析{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">故障统计分析</h1>
+            
+            <!-- 统计卡片 -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">总故障数</h5>
+                            <p class="card-text display-4">{{ total_faults }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">已解决</h5>
+                            <p class="card-text display-4">{{ status_count_dict['resolved'] }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">处理中</h5>
+                            <p class="card-text display-4">{{ status_count_dict['in_progress'] }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-danger">
+                        <div class="card-body">
+                            <h5 class="card-title">已报告</h5>
+                            <p class="card-text display-4">{{ status_count_dict['reported'] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 图表区域 -->
+            <div class="row">
+                <!-- 状态分布饼图 -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">故障状态分布</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 平均处理时长 -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">平均处理时长</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h1 class="display-1">{{ "%.2f"|format(avg_duration) }}</h1>
+                                <p class="lead">小时</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 故障类型统计 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">故障类型统计</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>故障类型</th>
+                                <th>数量</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if type_counts %}
+                                {% for fault_type, count in type_counts %}
+                                    <tr>
+                                        <td>{{ fault_type or '未分类' }}</td>
+                                        <td>{{ count }}</td>
+                                        <td>{{ "%.1f%%"|format((count / total_faults) * 100) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">暂无故障类型数据</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 设备故障统计 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">设备故障统计</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>设备名称</th>
+                                <th>故障数量</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if equipment_counts %}
+                                {% for equipment_name, count in equipment_counts %}
+                                    <tr>
+                                        <td>{{ equipment_name }}</td>
+                                        <td>{{ count }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">暂无设备故障数据</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 状态分布饼图
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['已报告', '处理中', '已解决', '已关闭'],
+                datasets: [{
+                    data: [{{ status_count_dict['reported'] }}, {{ status_count_dict['in_progress'] }}, {{ status_count_dict['resolved'] }}, {{ status_count_dict['closed'] }}],
+                    backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#6c757d'],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

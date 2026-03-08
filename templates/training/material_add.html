@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}上传培训资料{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">上传培训资料</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.training_plan_detail', id=plan.id) }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回详情
+                </a>
+            </div>
+            
+            <!-- 培训计划信息 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>{{ plan.title }}</h5>
+                    <p class="text-muted">培训时间：{{ plan.start_date.strftime('%Y-%m-%d %H:%M') }} 至 {{ plan.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+            
+            <!-- 上传资料表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('training.add_training_material', plan_id=plan.id) }}" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="title" class="form-label">资料名称 <span class="text-danger">*</span></label>
+                                <input type="text" name="title" id="title" class="form-control" required placeholder="请输入资料名称">
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="description" class="form-label">资料描述</label>
+                                <textarea name="description" id="description" class="form-control" rows="3" placeholder="请输入资料描述"></textarea>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="uploaded_by" class="form-label">上传人 <span class="text-danger">*</span></label>
+                                <input type="text" name="uploaded_by" id="uploaded_by" class="form-control" required placeholder="请输入上传人姓名">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="file" class="form-label">选择文件 <span class="text-danger">*</span></label>
+                                <input type="file" name="file" id="file" class="form-control" required>
+                                <div class="form-text">支持上传 txt, pdf, doc, docx, xls, xlsx, ppt, pptx, png, jpg, jpeg, gif 格式的文件</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">上传资料</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

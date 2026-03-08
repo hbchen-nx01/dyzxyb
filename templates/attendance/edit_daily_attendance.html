@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">编辑日考勤</h1>
+        <a href="{{ url_for('attendance.daily_attendance', month=attendance_date.strftime('%Y-%m')) }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 考勤日期信息 -->
+    <div class="mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">考勤日期：{{ attendance_date.strftime('%Y年%m月%d日') }}</h5>
+                <p class="card-text">
+                    星期：{{ ['一', '二', '三', '四', '五', '六', '日'][attendance_date.weekday()] }}
+                    {% if attendance_date.weekday() in [5, 6] %}
+                    <span class="text-danger">（周末）</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 考勤表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">员工考勤信息</h6>
+        </div>
+        <div class="card-body">
+            <form action="" method="post">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>员工编号</th>
+                                <th>员工姓名</th>
+                                <th>考勤状态</th>
+                                <th>备注</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for employee in employees %}
+                            <tr>
+                                <td>{{ employee.employee_id }}</td>
+                                <td>{{ employee.name }}</td>
+                                <td>
+                                    <select class="form-control" name="status_{{ employee.id }}">
+                                        <!-- 考勤状态选项 -->
+                                        <option value="1" {% if attendance_dict.get(employee.id).status == '1' %}selected{% endif %}>正常出勤（1）</option>
+                                        <option value="换" {% if attendance_dict.get(employee.id).status == '换' %}selected{% endif %}>换班</option>
+                                        <option value="值" {% if attendance_dict.get(employee.id).status == '值' %}selected{% endif %}>值班</option>
+                                        <option value="年" {% if attendance_dict.get(employee.id).status == '年' %}selected{% endif %}>年假</option>
+                                        <option value="病" {% if attendance_dict.get(employee.id).status == '病' %}selected{% endif %}>病假</option>
+                                        <option value="事" {% if attendance_dict.get(employee.id).status == '事' %}selected{% endif %}>事假</option>
+                                        <option value="产" {% if attendance_dict.get(employee.id).status == '产' %}selected{% endif %}>产假</option>
+                                        <option value="婚" {% if attendance_dict.get(employee.id).status == '婚' %}selected{% endif %}>婚假</option>
+                                        <option value="丧" {% if attendance_dict.get(employee.id).status == '丧' %}selected{% endif %}>丧假</option>
+                                        <option value="抚" {% if attendance_dict.get(employee.id).status == '抚' %}selected{% endif %}>抚恤假</option>
+                                        <option value="探" {% if attendance_dict.get(employee.id).status == '探' %}selected{% endif %}>探亲假</option>
+                                        <option value="育" {% if attendance_dict.get(employee.id).status == '育' %}selected{% endif %}>育儿假</option>
+                                        <option value="伤" {% if attendance_dict.get(employee.id).status == '伤' %}selected{% endif %}>工伤假</option>
+                                        <option value="旷" {% if attendance_dict.get(employee.id).status == '旷' %}selected{% endif %}>旷工</option>
+                                        <option value="护" {% if attendance_dict.get(employee.id).status == '护' %}selected{% endif %}>护理假</option>
+                                        <option value="休" {% if attendance_dict.get(employee.id).status == '休' %}selected{% endif %}>休息</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="notes_{{ employee.id }}" 
+                                           value="{{ attendance_dict.get(employee.id).notes if attendance_dict.get(employee.id) else '' }}">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save mr-2"></i> 保存考勤记录
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

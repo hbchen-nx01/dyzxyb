@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}导入员工信息{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">导入员工信息</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>导入说明</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>请确保Excel文件包含以下列：员工编号、姓名、性别、出生年月日、岗位分类、联系方式、学历、院校</li>
+                        <li>支持的文件格式：.xlsx、.xls</li>
+                        <li>员工编号不能重复，否则会跳过该记录</li>
+                        <li>日期格式请使用YYYY-MM-DD</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('employee.import_excel') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">选择Excel文件 *</label>
+                            <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls" required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('employee.employee_index') }}" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary">导入</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

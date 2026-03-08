@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">节假日值班安排 - {{ holiday.name }}</h1>
+        <div>
+            <a href="{{ url_for('attendance.add_holiday_duty', holiday_id=holiday.id) }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm mr-2">
+                <i class="fas fa-plus mr-2"></i> 添加值班安排
+            </a>
+            <a href="{{ url_for('attendance.holiday_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left mr-2"></i> 返回节假日列表
+            </a>
+        </div>
+    </div>
+
+    <!-- 节假日信息 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">节假日信息</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>日期：</strong> {{ holiday.holiday_date.strftime('%Y-%m-%d') }}</p>
+                    <p><strong>名称：</strong> {{ holiday.name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 值班安排列表 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">值班安排列表</h6>
+        </div>
+        <div class="card-body">
+            {% if duties %}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>值班人员</th>
+                            <th>值班时段</th>
+                            <th>联系方式</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for duty in duties %}
+                        <tr>
+                            <td>{{ duty.employee.name }}</td>
+                            <td>{{ duty.duty_time }}</td>
+                            <td>{{ duty.contact_info }}</td>
+                            <td>
+                                <a href="{{ url_for('attendance.edit_holiday_duty', duty_id=duty.id) }}" class="btn btn-sm btn-info mr-2">
+                                    <i class="fas fa-edit mr-1"></i> 编辑
+                                </a>
+                                <a href="{{ url_for('attendance.delete_holiday_duty', duty_id=duty.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个值班安排吗？')">
+                                    <i class="fas fa-trash mr-1"></i> 删除
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <h4 class="alert-heading">暂无值班安排</h4>
+                <p>点击上方"添加值班安排"按钮开始添加值班人员</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

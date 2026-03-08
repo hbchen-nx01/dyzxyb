@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}添加员工信息{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">添加员工信息</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('employee.add_employee') }}">
+                        <div class="mb-3">
+                            <label for="employee_id" class="form-label">员工编号 *</label>
+                            <input type="text" class="form-control" id="employee_id" name="employee_id" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">姓名 *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">性别 *</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="">请选择性别</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="birthday" class="form-label">出生年月日 *</label>
+                            <input type="date" class="form-control" id="birthday" name="birthday" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="position" class="form-label">岗位分类 *</label>
+                            <input type="text" class="form-control" id="position" name="position" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contact" class="form-label">联系方式 *</label>
+                            <input type="text" class="form-control" id="contact" name="contact" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="education" class="form-label">学历 *</label>
+                            <input type="text" class="form-control" id="education" name="education" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="school" class="form-label">院校 *</label>
+                            <input type="text" class="form-control" id="school" name="school" required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('employee.employee_index') }}" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

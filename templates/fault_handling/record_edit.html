@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑故障记录{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">编辑故障记录</h1>
+            
+            <!-- 编辑故障记录表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('fault_handling.edit_fault_record', id=fault_record.id) }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="equipment_id" class="form-label">设备 <span class="text-danger">*</span></label>
+                            <select name="equipment_id" id="equipment_id" class="form-select" required>
+                                {% for equipment in equipments %}
+                                    <option value="{{ equipment.id }}" {% if fault_record.equipment_id == equipment.id %}selected{% endif %}>{{ equipment.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fault_phenomenon" class="form-label">故障现象 <span class="text-danger">*</span></label>
+                            <textarea name="fault_phenomenon" id="fault_phenomenon" class="form-control" rows="4" required>{{ fault_record.fault_phenomenon }}</textarea>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="occurrence_date" class="form-label">故障发生日期 <span class="text-danger">*</span></label>
+                                <input type="date" name="occurrence_date" id="occurrence_date" class="form-control" value="{{ fault_record.occurrence_time.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="occurrence_time" class="form-label">故障发生时间 <span class="text-danger">*</span></label>
+                                <input type="time" name="occurrence_time" id="occurrence_time" class="form-control" value="{{ fault_record.occurrence_time.strftime('%H:%M') }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reporter" class="form-label">报告人 <span class="text-danger">*</span></label>
+                            <input type="text" name="reporter" id="reporter" class="form-control" value="{{ fault_record.reporter }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fault_type" class="form-label">故障类型</label>
+                            <input type="text" name="fault_type" id="fault_type" class="form-control" value="{{ fault_record.fault_type or '' }}" placeholder="例如：电气故障、机械故障等">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fault_image" class="form-label">故障图片</label>
+                            {% if fault_record.fault_image %}
+                                <div class="mb-2">
+                                    <img src="{{ url_for('static', filename='uploads/' + fault_record.fault_image) }}" alt="故障图片" class="img-thumbnail" style="max-width: 200px;">
+                                    <p class="text-muted mt-1">当前图片：{{ fault_record.fault_image }}</p>
+                                </div>
+                            {% endif %}
+                            <input type="file" name="fault_image" id="fault_image" class="form-control" accept="image/*">
+                            <div class="form-text">支持上传jpg、jpeg、png、gif格式图片，大小不超过16MB</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">状态 <span class="text-danger">*</span></label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="reported" {% if fault_record.status == 'reported' %}selected{% endif %}>已报告</option>
+                                <option value="in_progress" {% if fault_record.status == 'in_progress' %}selected{% endif %}>处理中</option>
+                                <option value="resolved" {% if fault_record.status == 'resolved' %}selected{% endif %}>已解决</option>
+                                <option value="closed" {% if fault_record.status == 'closed' %}selected{% endif %}>已关闭</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('fault_handling.fault_record_index') }}" class="btn btn-secondary me-2">取消</a>
+                            <button type="submit" class="btn btn-primary">保存修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

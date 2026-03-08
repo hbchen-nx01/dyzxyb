@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}添加培训经历{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">添加培训经历 - {{ employee.name }}</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('employee.add_training_experience', employee_id=employee.id) }}">
+                        <div class="mb-3">
+                            <label for="training_name" class="form-label">培训名称 *</label>
+                            <input type="text" class="form-control" id="training_name" name="training_name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="training_organization" class="form-label">培训组织 *</label>
+                            <input type="text" class="form-control" id="training_organization" name="training_organization" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">开始日期 *</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">结束日期 *</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="training_content" class="form-label">培训内容 *</label>
+                            <textarea class="form-control" id="training_content" name="training_content" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('employee.employee_detail', id=employee.id) }}" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

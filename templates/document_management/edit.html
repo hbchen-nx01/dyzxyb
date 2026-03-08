@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑文档{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mb-4">编辑文档</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('document_management.edit_document', id=document.id) }}">
+                    <div class="form-group">
+                        <label for="title">文档标题</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ document.title }}" required placeholder="请输入文档标题">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_id">文档分类</label>
+                        <select class="form-control" id="category_id" name="category_id" required>
+                            <option value="">请选择分类</option>
+                            {% for category in categories if not category.parent_id %}
+                                <option value="{{ category.id }}" {% if document.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                {% for subcategory in categories if subcategory.parent_id == category.id %}
+                                    <option value="{{ subcategory.id }}" {% if document.category_id == subcategory.id %}selected{% endif %}>&nbsp;&nbsp;└─ {{ subcategory.name }}</option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="uploader">上传人</label>
+                        <input type="text" class="form-control" id="uploader" name="uploader" value="{{ document.uploader }}" required placeholder="请输入上传人姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="file_name">文件名</label>
+                        <input type="text" class="form-control" id="file_name" value="{{ document.file_name }}" readonly>
+                        <small class="form-text text-muted">文件名不可修改</small>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary mr-2">保存修改</button>
+                        <a href="{{ url_for('document_management.document_management_index') }}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

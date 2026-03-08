@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}添加解决方案{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加解决方案</h1>
+            
+            <!-- 添加解决方案表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">故障信息</h5>
+                    <p><strong>设备：</strong>{{ fault_record.equipment.name }}</p>
+                    <p><strong>故障现象：</strong>{{ fault_record.fault_phenomenon }}</p>
+                    <p><strong>状态：</strong>
+                        {% if fault_record.status == 'reported' %}
+                            <span class="badge bg-warning">已报告</span>
+                        {% elif fault_record.status == 'in_progress' %}
+                            <span class="badge bg-info">处理中</span>
+                        {% elif fault_record.status == 'resolved' %}
+                            <span class="badge bg-success">已解决</span>
+                        {% elif fault_record.status == 'closed' %}
+                            <span class="badge bg-secondary">已关闭</span>
+                        {% endif %}
+                    </p>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="card-title mb-4">解决方案</h5>
+                    <form method="post" action="{{ url_for('fault_handling.add_fault_solution', fault_id=fault_record.id) }}">
+                        <div class="mb-3">
+                            <label for="handler" class="form-label">处理人 <span class="text-danger">*</span></label>
+                            <input type="text" name="handler" id="handler" class="form-control" required>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label">开始处理日期 <span class="text-danger">*</span></label>
+                                <input type="date" name="start_date" id="start_date" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="start_time" class="form-label">开始处理时间 <span class="text-danger">*</span></label>
+                                <input type="time" name="start_time" id="start_time" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label">结束处理日期</label>
+                                <input type="date" name="end_date" id="end_date" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="end_time" class="form-label">结束处理时间</label>
+                                <input type="time" name="end_time" id="end_time" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="process_description" class="form-label">处理过程</label>
+                            <textarea name="process_description" id="process_description" class="form-control" rows="4" placeholder="详细描述故障处理的过程和步骤"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="solution" class="form-label">解决方案 <span class="text-danger">*</span></label>
+                            <textarea name="solution" id="solution" class="form-control" rows="4" required placeholder="详细描述最终的解决方案"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="verification_result" class="form-label">验证结果</label>
+                            <select name="verification_result" id="verification_result" class="form-select">
+                                <option value="">未验证</option>
+                                <option value="passed">通过</option>
+                                <option value="failed">失败</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">备注</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="2" placeholder="其他需要说明的信息"></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('fault_handling.view_fault_record', id=fault_record.id) }}" class="btn btn-secondary me-2">取消</a>
+                            <button type="submit" class="btn btn-primary">保存解决方案</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

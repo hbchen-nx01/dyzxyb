@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}班组光荣榜{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">班组光荣榜</h1>
+            
+            <!-- 查询表单 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>查询条件</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{{ url_for('honor_board.honor_board_index') }}">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="employee_name" class="form-label">人员姓名</label>
+                                    <input type="text" class="form-control" id="employee_name" name="employee_name" placeholder="请输入人员姓名" value="{{ request.args.get('employee_name', '') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="award_type" class="form-label">奖励类型</label>
+                                    <input type="text" class="form-control" id="award_type" name="award_type" placeholder="请输入奖励类型" value="{{ request.args.get('award_type', '') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="start_date" class="form-label">开始日期</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="end_date" class="form-label">结束日期</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary me-2">查询</button>
+                                <a href="{{ url_for('honor_board.honor_board_index') }}" class="btn btn-secondary me-2">重置</a>
+                                <a href="{{ url_for('honor_board.add_honor') }}" class="btn btn-success me-2">添加条目</a>
+                                <a href="{{ url_for('honor_board.open_image_folder') }}" class="btn btn-info">打开图片文件夹</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 光荣榜条目列表 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>光荣榜条目</h5>
+                </div>
+                <div class="card-body">
+                    {% if honor_list %}
+                        <div class="row">
+                            {% for honor in honor_list %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        {% if honor.image_path %}
+                                            <div class="card-img-top">
+                                                <img src="{{ url_for('honor_board.uploaded_file', filename=honor.image_path) }}" alt="{{ honor.employee_name }} - {{ honor.award_type }}" class="img-fluid honor-image" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ url_for('honor_board.uploaded_file', filename=honor.image_path) }}">
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ honor.employee_name }} - {{ honor.award_type }}</h5>
+                                            <p class="card-text">{{ honor.award_content }}</p>
+                                            <p class="card-text"><small class="text-muted">获得时间：{{ honor.award_date.strftime('%Y-%m-%d') }}</small></p>
+                                            <div class="d-flex justify-content-end">
+                                                <a href="{{ url_for('honor_board.edit_honor', id=honor.id) }}" class="btn btn-primary btn-sm me-2">编辑</a>
+                                                <form action="{{ url_for('honor_board.delete_honor', id=honor.id) }}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这条光荣榜条目吗？')">删除</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            暂无光荣榜条目
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 图片查看模态框 -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">图片查看</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="图片" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 图片查看脚本 -->
+    <script>
+        // 当模态框显示时，更新图片源
+        var imageModal = document.getElementById('imageModal');
+        imageModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var imageUrl = button.getAttribute('data-image');
+            var modalImage = document.getElementById('modalImage');
+            modalImage.src = imageUrl;
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">考勤统计分析</h1>
+        <div>
+            <form action="" method="get" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="month" class="sr-only">月份</label>
+                    <input type="month" class="form-control" id="month" name="month" value="{{ current_month }}" onchange="this.form.submit()">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 考勤内部导航 -->
+    {% include 'components/attendance_nav.html' %}
+    
+    <!-- 考勤统计列表 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">{{ current_month }} 考勤统计</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>员工编号</th>
+                            <th>员工姓名</th>
+                            <th>总考勤天数</th>
+                            <th>正常出勤</th>
+                            <th>换班</th>
+                            <th>年假</th>
+                            <th>病假</th>
+                            <th>事假</th>
+                            <th>产假</th>
+                            <th>婚假</th>
+                            <th>丧假</th>
+                            <th>抚恤假</th>
+                            <th>探亲假</th>
+                            <th>育儿假</th>
+                            <th>工伤假</th>
+                            <th>旷工</th>
+                            <th>护理假</th>
+                            <th>休息</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in statistics %}
+                        <tr>
+                            <td>{{ stat.employee.employee_id }}</td>
+                            <td>{{ stat.employee.name }}</td>
+                            <td>{{ stat.total_days }}</td>
+                            <td>{{ stat.status_count.get('1', 0) }}</td>
+                            <td>{{ stat.status_count.get('换', 0) }}</td>
+                            <td>{{ stat.status_count.get('年', 0) }}</td>
+                            <td>{{ stat.status_count.get('病', 0) }}</td>
+                            <td>{{ stat.status_count.get('事', 0) }}</td>
+                            <td>{{ stat.status_count.get('产', 0) }}</td>
+                            <td>{{ stat.status_count.get('婚', 0) }}</td>
+                            <td>{{ stat.status_count.get('丧', 0) }}</td>
+                            <td>{{ stat.status_count.get('抚', 0) }}</td>
+                            <td>{{ stat.status_count.get('探', 0) }}</td>
+                            <td>{{ stat.status_count.get('育', 0) }}</td>
+                            <td>{{ stat.status_count.get('伤', 0) }}</td>
+                            <td>{{ stat.status_count.get('旷', 0) }}</td>
+                            <td>{{ stat.status_count.get('护', 0) }}</td>
+                            <td>{{ stat.status_count.get('休', 0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

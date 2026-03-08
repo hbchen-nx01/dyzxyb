@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}经验分享{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-3">
+            <!-- 分类导航 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>文章分类</h5>
+                </div>
+                <div class="list-group">
+                    <a href="{{ url_for('experience.experience_index') }}" class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">全部内容</a>
+                    {% for category in categories %}
+                        <a href="{{ url_for('experience.experience_index', category_id=category.id) }}" class="list-group-item list-group-item-action {% if selected_category == category.id %}active{% endif %}">{{ category.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 搜索框 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>搜索内容</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('experience.search_article') }}" method="get">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="输入关键词搜索" name="keyword">
+                            <button class="btn btn-primary" type="submit">搜索</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <h1 class="mb-4">经验分享</h1>
+            
+            <!-- 快速分享表单 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>快速分享</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('experience.quick_share') }}" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="quick_author" class="form-label">昵称</label>
+                                <input type="text" class="form-control" id="quick_author" name="author" placeholder="请输入您的昵称">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="quick_category" class="form-label">分类</label>
+                                <select class="form-select" id="quick_category" name="category_id" required>
+                                    <option value="">请选择分类</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quick_content" class="form-label">分享内容</label>
+                            <textarea class="form-control" id="quick_content" name="content" rows="2" placeholder="请输入您的分享内容" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quick_media" class="form-label">上传图片/视频</label>
+                            <input class="form-control" type="file" id="quick_media" name="media" accept="image/*,video/*" multiple>
+                        </div>
+                        <button type="submit" class="btn btn-primary">发布分享</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 添加文章按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('experience.add_article') }}" class="btn btn-success">
+                    <i class="bi bi-plus"></i> 发布文章
+                </a>
+            </div>
+            
+            <!-- 文章和分享列表 -->
+            {% if articles %}
+                {% for article in articles %}
+                    {% if article.type == 'share' %}
+                        <!-- 短分享卡片 -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="badge bg-info me-2">分享</span>
+                                        <span class="badge bg-primary me-2">{{ article.category.name }}</span>
+                                        <span class="text-muted me-2">{{ article.author }}</span>
+                                        <span class="text-muted">{{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('experience.edit_article', id=article.id) }}" class="btn btn-sm btn-warning me-1">编辑</a>
+                                        <form action="{{ url_for('experience.delete_article', id=article.id) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这条分享吗？')">删除</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <p class="card-text">{{ article.content }}</p>
+                                
+                                <!-- 分享媒体 -->
+                                {% if article.media %}
+                                    <div class="row mt-3">
+                                        {% for media in article.media %}
+                                            <div class="col-md-4 mb-3">
+                                                {% if media.file_type == 'image' %}
+                                                    <img src="{{ url_for('experience.experience_media', filename=media.file_path) }}" class="img-fluid rounded" alt="分享图片">
+                                                {% elif media.file_type == 'video' %}
+                                                    <video class="img-fluid rounded" controls>
+                                                        <source src="{{ url_for('experience.experience_media', filename=media.file_path) }}" type="video/mp4">
+                                                    </video>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- 互动按钮 -->
+                                <div class="mt-3">
+                                    <a href="{{ url_for('experience.article_detail', id=article.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="bi bi-chat"></i> {{ article.comments|length }} 评论
+                                    </a>
+                                    <form action="{{ url_for('experience.like_article', id=article.id) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-heart"></i> {{ article.likes }} 点赞
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- 长文章卡片 -->
+                        <div class="card mb-4">
+                            {% if article.media %}
+                                {% set first_image = article.media | selectattr('file_type', 'equalto', 'image') | first %}
+                                {% if first_image %}
+                                    <img src="{{ url_for('experience.experience_media', filename=first_image.file_path) }}" class="card-img-top" alt="文章图片" style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="{{ url_for('experience.article_detail', id=article.id) }}" class="text-decoration-none">{{ article.title }}</a></h5>
+                                <div class="card-subtitle mb-2 text-muted">
+                                    <span class="badge bg-primary">{{ article.category.name }}</span>
+                                    <span class="ms-2">作者：{{ article.author }}</span>
+                                    <span class="ms-2">{{ article.created_at.strftime('%Y-%m-%d') }}</span>
+                                </div>
+                                <p class="card-text">{{ article.content[:200] }}...</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ url_for('experience.article_detail', id=article.id) }}" class="btn btn-primary btn-sm">阅读全文</a>
+                                    <div>
+                                        <span class="me-3"><i class="bi bi-eye"></i> {{ article.views }}</span>
+                                        <span class="me-3"><i class="bi bi-heart"></i> {{ article.likes }}</span>
+                                        <span><i class="bi bi-chat"></i> {{ article.comments|length }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+                <!-- 分页 -->
+                {% if pagination %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('experience.experience_index', page=pagination.prev_num, category_id=selected_category) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if pagination.page == page_num %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('experience.experience_index', page=page_num, category_id=selected_category) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('experience.experience_index', page=pagination.next_num, category_id=selected_category) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    暂无内容
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}故障案例查询{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">故障案例查询</h1>
+            
+            <!-- 搜索和筛选 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{{ url_for('fault_handling.fault_cases') }}">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="keyword" class="form-label">关键词</label>
+                                <input type="text" name="keyword" id="keyword" class="form-control" value="{{ keyword or '' }}" placeholder="故障现象、类型等">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="equipment_id" class="form-label">设备</label>
+                                <select name="equipment_id" id="equipment_id" class="form-select">
+                                    <option value="">所有设备</option>
+                                    {% for equipment in equipments %}
+                                        <option value="{{ equipment.id }}" {% if selected_equipment == equipment.id %}selected{% endif %}>{{ equipment.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="fault_type" class="form-label">故障类型</label>
+                                <select name="fault_type" id="fault_type" class="form-select">
+                                    <option value="">所有类型</option>
+                                    {% for ft in fault_types %}
+                                        <option value="{{ ft }}" {% if selected_fault_type == ft %}selected{% endif %}>{{ ft }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">搜索</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 案例列表 -->
+            {% if cases %}
+                <div class="row">
+                    {% for case in cases %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="card-title mb-0">{{ case.equipment.name }} - {{ case.fault_type or '未分类' }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>故障现象：</strong>{{ case.fault_phenomenon[:100] }}{% if case.fault_phenomenon|length > 100 %}...{% endif %}</p>
+                                    <p><strong>发生时间：</strong>{{ case.occurrence_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    <p><strong>报告人：</strong>{{ case.reporter }}</p>
+                                    
+                                    <!-- 获取解决方案 -->
+                                    {% set solutions = case.solutions|selectattr('verification_result', 'equalto', 'passed')|first %}
+                                    {% if solutions %}
+                                        <p><strong>解决方案：</strong>{{ solutions.solution[:100] }}{% if solutions.solution|length > 100 %}...{% endif %}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ url_for('fault_handling.view_fault_record', id=case.id) }}" class="btn btn-primary btn-sm">查看详情</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- 分页 -->
+                {% if pagination %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('fault_handling.fault_cases', page=pagination.prev_num, keyword=keyword, equipment_id=selected_equipment, fault_type=selected_fault_type) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if pagination.page == page_num %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('fault_handling.fault_cases', page=page_num, keyword=keyword, equipment_id=selected_equipment, fault_type=selected_fault_type) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('fault_handling.fault_cases', page=pagination.next_num, keyword=keyword, equipment_id=selected_equipment, fault_type=selected_fault_type) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    暂无故障案例数据
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

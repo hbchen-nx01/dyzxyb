@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}添加培训评估{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加培训评估</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.training_plan_detail', id=plan.id) }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回详情
+                </a>
+            </div>
+            
+            <!-- 培训计划信息 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>{{ plan.title }}</h5>
+                    <p class="text-muted">培训时间：{{ plan.start_date.strftime('%Y-%m-%d %H:%M') }} 至 {{ plan.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+            
+            <!-- 培训评估表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('training.add_training_evaluation', plan_id=plan.id) }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="evaluator" class="form-label">评估人 <span class="text-danger">*</span></label>
+                                <input type="text" name="evaluator" id="evaluator" class="form-control" required placeholder="请输入评估人姓名">
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="content_relevance" class="form-label">内容相关性 <span class="text-danger">*</span></label>
+                                <select name="content_relevance" id="content_relevance" class="form-select" required>
+                                    <option value="">选择评分</option>
+                                    {% for i in range(1, 6) %}
+                                        <option value="{{ i }}">{{ i }}分</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="trainer_effectiveness" class="form-label">讲师效果 <span class="text-danger">*</span></label>
+                                <select name="trainer_effectiveness" id="trainer_effectiveness" class="form-select" required>
+                                    <option value="">选择评分</option>
+                                    {% for i in range(1, 6) %}
+                                        <option value="{{ i }}">{{ i }}分</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="overall_satisfaction" class="form-label">总体满意度 <span class="text-danger">*</span></label>
+                                <select name="overall_satisfaction" id="overall_satisfaction" class="form-select" required>
+                                    <option value="">选择评分</option>
+                                    {% for i in range(1, 6) %}
+                                        <option value="{{ i }}">{{ i }}分</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="comments" class="form-label">评估意见</label>
+                                <textarea name="comments" id="comments" class="form-control" rows="4" placeholder="请输入评估意见"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">提交评估</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

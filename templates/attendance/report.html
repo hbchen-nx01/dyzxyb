@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">考勤报表生成</h1>
+    </div>
+
+    <!-- 考勤内部导航 -->
+    {% include 'components/attendance_nav.html' %}
+    
+    <!-- 报表生成表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">生成考勤报表</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('attendance.generate_attendance_report') }}" method="post">
+                <div class="form-row">
+                    <!-- 开始日期 -->
+                    <div class="form-group col-md-6">
+                        <label for="start_date">开始日期</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    
+                    <!-- 结束日期 -->
+                    <div class="form-group col-md-6">
+                        <label for="end_date">结束日期</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <!-- 员工选择 -->
+                    <div class="form-group col-md-6">
+                        <label for="employee_id">员工（可选）</label>
+                        <select class="form-control" id="employee_id" name="employee_id">
+                            <option value="">全部员工</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.employee_id }} - {{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-file-excel mr-2"></i> 生成并导出Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+
+{% block title %}培训计划详情{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">培训计划详情</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.training_plan_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回列表
+                </a>
+            </div>
+            
+            <!-- 基本信息卡片 -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">{{ plan.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>讲师：</strong>{{ plan.trainer }}</p>
+                            <p><strong>开始时间：</strong>{{ plan.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>结束时间：</strong>{{ plan.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>培训地点：</strong>{{ plan.location }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>状态：</strong>
+                                {% if plan.status == 'planned' %}
+                                    <span class="badge bg-warning">计划中</span>
+                                {% elif plan.status == 'in_progress' %}
+                                    <span class="badge bg-info">进行中</span>
+                                {% elif plan.status == 'completed' %}
+                                    <span class="badge bg-success">已完成</span>
+                                {% elif plan.status == 'cancelled' %}
+                                    <span class="badge bg-danger">已取消</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>创建人：</strong>{{ plan.created_by }}</p>
+                            <p><strong>创建时间：</strong>{{ plan.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>最后更新：</strong>{{ plan.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        </div>
+                    </div>
+                    {% if plan.description %}
+                        <div class="mt-3">
+                            <h6>培训描述</h6>
+                            <p>{{ plan.description }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 参与人员管理 -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">参与人员管理</h5>
+                        <a href="{{ url_for('training.manage_participants', plan_id=plan.id) }}" class="btn btn-sm btn-light">
+                            <i class="bi bi-pencil"></i> 编辑参与人员
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if participants %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>是否出勤</th>
+                                    <th>考核分数</th>
+                                    <th>考核结果</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for participant in participants %}
+                                    <tr>
+                                        <td>{{ participant.employee.name }}</td>
+                                        <td>
+                                            {% if participant.attendance %}
+                                                <span class="badge bg-success">是</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">否</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ participant.score or '未评分' }}</td>
+                                        <td>
+                                            {% if participant.assessment %}
+                                                {% if participant.assessment == 'excellent' %}
+                                                    <span class="badge bg-primary">优秀</span>
+                                                {% elif participant.assessment == 'good' %}
+                                                    <span class="badge bg-success">良好</span>
+                                                {% elif participant.assessment == 'pass' %}
+                                                    <span class="badge bg-info">及格</span>
+                                                {% elif participant.assessment == 'fail' %}
+                                                    <span class="badge bg-danger">不及格</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">未评估</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <!-- 考核结果编辑按钮（使用模态框） -->
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#updateAssessmentModal{{ participant.id }}">
+                                                <i class="bi bi-pencil"></i> 考核
+                                            </button>
+                                            
+                                            <!-- 考核结果编辑模态框 -->
+                                            <div class="modal fade" id="updateAssessmentModal{{ participant.id }}" tabindex="-1" aria-labelledby="updateAssessmentModalLabel{{ participant.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="updateAssessmentModalLabel{{ participant.id }}">更新考核结果 - {{ participant.employee.name }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <form method="post" action="{{ url_for('training.update_participant', id=participant.id) }}">
+                                                            <div class="modal-body">
+                                                                <div class="mb-3">
+                                                                    <label for="attendance{{ participant.id }}" class="form-label">是否出勤</label>
+                                                                    <select name="attendance" id="attendance{{ participant.id }}" class="form-select">
+                                                                        <option value="true" {% if participant.attendance %}selected{% endif %}>是</option>
+                                                                        <option value="false" {% if not participant.attendance %}selected{% endif %}>否</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="score{{ participant.id }}" class="form-label">考核分数</label>
+                                                                    <input type="number" name="score" id="score{{ participant.id }}" class="form-control" step="0.1" min="0" max="100" value="{{ participant.score or '' }}" placeholder="0-100">
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="assessment{{ participant.id }}" class="form-label">考核结果</label>
+                                                                    <select name="assessment" id="assessment{{ participant.id }}" class="form-select">
+                                                                        <option value="">请选择</option>
+                                                                        <option value="excellent" {% if participant.assessment == 'excellent' %}selected{% endif %}>优秀</option>
+                                                                        <option value="good" {% if participant.assessment == 'good' %}selected{% endif %}>良好</option>
+                                                                        <option value="pass" {% if participant.assessment == 'pass' %}selected{% endif %}>及格</option>
+                                                                        <option value="fail" {% if participant.assessment == 'fail' %}selected{% endif %}>不及格</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                                <button type="submit" class="btn btn-primary">保存</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            暂无参与人员，请<a href="{{ url_for('training.manage_participants', plan_id=plan.id) }}" class="alert-link">添加参与人员</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 培训资料管理 -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">培训资料管理</h5>
+                        <a href="{{ url_for('training.add_training_material', plan_id=plan.id) }}" class="btn btn-sm btn-dark">
+                            <i class="bi bi-plus"></i> 上传资料
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if materials %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>资料名称</th>
+                                    <th>文件类型</th>
+                                    <th>上传人</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for material in materials %}
+                                    <tr>
+                                        <td>{{ material.title }}</td>
+                                        <td>{{ material.file_type }}</td>
+                                        <td>{{ material.uploaded_by }}</td>
+                                        <td>{{ material.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('training.download_training_material', id=material.id) }}" class="btn btn-sm btn-info me-1">
+                                                <i class="bi bi-download"></i> 下载
+                                            </a>
+                                            <form action="{{ url_for('training.delete_training_material', id=material.id) }}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个培训资料吗？')">
+                                                    <i class="bi bi-trash"></i> 删除
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            暂无培训资料，请<a href="{{ url_for('training.add_training_material', plan_id=plan.id) }}" class="alert-link">上传培训资料</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 培训评估管理 -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">培训评估管理</h5>
+                        <a href="{{ url_for('training.add_training_evaluation', plan_id=plan.id) }}" class="btn btn-sm btn-light">
+                            <i class="bi bi-plus"></i> 添加评估
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if evaluations %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>评估人</th>
+                                    <th>内容相关性</th>
+                                    <th>讲师效果</th>
+                                    <th>总体满意度</th>
+                                    <th>评估意见</th>
+                                    <th>评估时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evaluation in evaluations %}
+                                    <tr>
+                                        <td>{{ evaluation.evaluator }}</td>
+                                        <td>{{ evaluation.content_relevance }}/5</td>
+                                        <td>{{ evaluation.trainer_effectiveness }}/5</td>
+                                        <td>{{ evaluation.overall_satisfaction }}/5</td>
+                                        <td>{{ evaluation.comments or '无' }}</td>
+                                        <td>{{ evaluation.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            暂无培训评估，请<a href="{{ url_for('training.add_training_evaluation', plan_id=plan.id) }}" class="alert-link">添加培训评估</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 培训证书管理 -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">培训证书管理</h5>
+                        <a href="{{ url_for('training.add_training_certificate', plan_id=plan.id) }}" class="btn btn-sm btn-light">
+                            <i class="bi bi-plus"></i> 添加证书
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if certificates %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>证书编号</th>
+                                    <th>颁发日期</th>
+                                    <th>有效期至</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for certificate in certificates %}
+                                    <tr>
+                                        <td>{{ certificate.employee.name }}</td>
+                                        <td>{{ certificate.certificate_number }}</td>
+                                        <td>{{ certificate.issue_date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ certificate.valid_until.strftime('%Y-%m-%d') if certificate.valid_until else '永久有效' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            暂无培训证书，请<a href="{{ url_for('training.add_training_certificate', plan_id=plan.id) }}" class="alert-link">添加培训证书</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">请假申请管理</h1>
+        <a href="{{ url_for('attendance.add_leave_application') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus mr-2"></i> 提交请假申请
+        </a>
+    </div>
+
+    <!-- 考勤内部导航 -->
+    {% include 'components/attendance_nav.html' %}
+    
+    <!-- 请假申请表格 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">请假申请列表</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>申请ID</th>
+                            <th>员工</th>
+                            <th>请假类型</th>
+                            <th>开始日期</th>
+                            <th>结束日期</th>
+                            <th>时长（天）</th>
+                            <th>状态</th>
+                            <th>提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for application in applications %}
+                        <tr>
+                            <td>{{ application.id }}</td>
+                            <td>{{ application.employee.employee_id }} - {{ application.employee.name }}</td>
+                            <td>{{ application.leave_type }}</td>
+                            <td>{{ application.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ application.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ application.duration }}</td>
+                            <td>
+                                <span class="badge badge-{{ 
+                                    'primary' if application.status == 'pending' else 
+                                    'success' if application.status == 'approved' else 
+                                    'danger' if application.status == 'rejected' else 'secondary' 
+                                }}">
+                                    {{ 
+                                        '待审批' if application.status == 'pending' else 
+                                        '已批准' if application.status == 'approved' else 
+                                        '已拒绝' if application.status == 'rejected' else '已取消' 
+                                    }}
+                                </span>
+                            </td>
+                            <td>{{ application.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if application.status == 'pending' %}
+                                <a href="{{ url_for('attendance.approve_leave_application', application_id=application.id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-check mr-1"></i> 审批
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

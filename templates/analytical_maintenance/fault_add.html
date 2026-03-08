@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}添加故障记录 - 仪表维护{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>添加故障记录</h2>
+    <form method="POST" action="{{ url_for('analytical_maintenance.fault_add') }}" enctype="multipart/form-data">
+        <div class="row">
+            <!-- 左侧表单 -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="equipment_id" class="form-label">仪表名称</label>
+                    <select class="form-select" id="equipment_id" name="equipment_id" required>
+                        <option value="">请选择仪表</option>
+                        {% for equipment in equipments %}
+                        <option value="{{ equipment.id }}">{{ equipment.name }} ({{ equipment.model }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="fault_phenomenon" class="form-label">故障现象</label>
+                    <textarea class="form-control" id="fault_phenomenon" name="fault_phenomenon" rows="3" required></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="occurrence_time" class="form-label">故障发生时间</label>
+                    <input type="datetime-local" class="form-control" id="occurrence_time" name="occurrence_time" required value="{{ now.strftime('%Y-%m-%dT%H:%M') }}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="reporter" class="form-label">报告人</label>
+                    <input type="text" class="form-control" id="reporter" name="reporter" required>
+                </div>
+            </div>
+            
+            <!-- 右侧表单 -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="fault_type" class="form-label">故障类型</label>
+                    <input type="text" class="form-control" id="fault_type" name="fault_type">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="impact_level" class="form-label">影响程度</label>
+                    <select class="form-select" id="impact_level" name="impact_level">
+                        <option value="">请选择影响程度</option>
+                        <option value="critical">严重</option>
+                        <option value="major">主要</option>
+                        <option value="minor">次要</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="urgency_level" class="form-label">紧急程度</label>
+                    <select class="form-select" id="urgency_level" name="urgency_level">
+                        <option value="">请选择紧急程度</option>
+                        <option value="urgent">紧急</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 表单按钮 -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary me-2">添加故障记录</button>
+            <a href="{{ url_for('analytical_maintenance.fault_index') }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

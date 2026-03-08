@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}添加维护记录{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加维护记录</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="equipment_id" class="form-label">设备名称</label>
+                                <select class="form-select" id="equipment_id" name="equipment_id" required>
+                                    <option value="">请选择设备</option>
+                                    {% for equipment in equipments %}
+                                        <option value="{{ equipment.id }}">{{ equipment.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="plan_id" class="form-label">维护计划</label>
+                                <select class="form-select" id="plan_id" name="plan_id" required>
+                                    <option value="">请选择计划</option>
+                                    {% for plan in plans %}
+                                        <option value="{{ plan.id }}">{{ plan.plan_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="maintenance_date" class="form-label">维护日期</label>
+                                <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="executor" class="form-label">执行人</label>
+                                <input type="text" class="form-control" id="executor" name="executor" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="content" class="form-label">维护内容</label>
+                                <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="result" class="form-label">维护结果</label>
+                                <select class="form-select" id="result" name="result" required>
+                                    <option value="">请选择结果</option>
+                                    <option value="success">成功</option>
+                                    <option value="failure">失败</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="maintenance_cost" class="form-label">维护成本（元）</label>
+                                <input type="number" class="form-control" id="maintenance_cost" name="maintenance_cost" step="0.01" min="0">
+                            </div>
+                            <div class="col-md-12">
+                                <label for="spare_parts_used" class="form-label">使用的备件</label>
+                                <textarea class="form-control" id="spare_parts_used" name="spare_parts_used" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="notes" class="form-label">备注</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">保存记录</button>
+                                <a href="{{ url_for('analytical_maintenance.record_index') }}" class="btn btn-secondary">取消</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}故障详情 - 仪表维护{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>故障详情</h2>
+    
+    <!-- 故障基本信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>基本信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>仪表名称：</strong>{{ fault.equipment.name }}</p>
+                    <p><strong>型号规格：</strong>{{ fault.equipment.model }}</p>
+                    <p><strong>故障现象：</strong>{{ fault.fault_phenomenon }}</p>
+                    <p><strong>故障发生时间：</strong>{{ fault.occurrence_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>报告人：</strong>{{ fault.reporter }}</p>
+                    <p><strong>故障类型：</strong>{{ fault.fault_type or '未分类' }}</p>
+                    <p><strong>影响程度：</strong>
+                        {% if fault.impact_level == 'critical' %}严重
+                        {% elif fault.impact_level == 'major' %}主要
+                        {% elif fault.impact_level == 'minor' %}次要
+                        {% else %}未指定
+                        {% endif %}
+                    </p>
+                    <p><strong>紧急程度：</strong>
+                        {% if fault.urgency_level == 'urgent' %}紧急
+                        {% elif fault.urgency_level == 'high' %}高
+                        {% elif fault.urgency_level == 'medium' %}中
+                        {% elif fault.urgency_level == 'low' %}低
+                        {% else %}未指定
+                        {% endif %}
+                    </p>
+                    <p><strong>故障状态：</strong>
+                        {% if fault.status == 'reported' %}已报告
+                        {% elif fault.status == 'in_progress' %}处理中
+                        {% elif fault.status == 'resolved' %}已解决
+                        {% elif fault.status == 'closed' %}已关闭
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 故障解决方案 -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>故障解决方案</h5>
+            {% if fault.status != 'resolved' %}
+            <a href="{{ url_for('analytical_maintenance.fault_solution_add', fault_id=fault.id) }}" class="btn btn-primary btn-sm">添加解决方案</a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if fault.solutions %}
+            {% for solution in fault.solutions %}
+            <div class="mb-4 pb-4 border-bottom">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>处理人：</strong>{{ solution.handler }}</p>
+                        <p><strong>开始处理时间：</strong>{{ solution.start_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p><strong>结束处理时间：</strong>{{ solution.end_time.strftime('%Y-%m-%d %H:%M:%S') if solution.end_time else '未结束' }}</p>
+                        <p><strong>处理时长：</strong>{{ '%.2f小时' % solution.handling_duration if solution.handling_duration else '未结束' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>验证结果：</strong>
+                            {% if solution.verification_result == 'passed' %}通过
+                            {% elif solution.verification_result == 'failed' %}失败
+                            {% else %}未验证
+                            {% endif %}
+                        </p>
+                        <p><strong>使用备件：</strong>{{ solution.spare_parts_used or '无' }}</p>
+                        <p><strong>维修成本：</strong>{{ '%.2f元' % solution.repair_cost if solution.repair_cost else '无' }}</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <strong>处理过程：</strong>
+                    <p>{{ solution.process_description or '无' }}</p>
+                </div>
+                <div class="mt-3">
+                    <strong>解决方案：</strong>
+                    <p>{{ solution.solution }}</p>
+                </div>
+                <div class="mt-3">
+                    <strong>备注：</strong>
+                    <p>{{ solution.notes or '无' }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>暂无解决方案</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 返回按钮 -->
+    <div class="mt-4">
+        <a href="{{ url_for('analytical_maintenance.fault_index') }}" class="btn btn-secondary">返回列表</a>
+    </div>
+</div>
+{% endblock %}

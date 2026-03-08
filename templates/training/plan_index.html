@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}培训计划管理{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">培训计划管理</h1>
+            
+            <!-- 添加培训计划按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.add_training_plan') }}" class="btn btn-success">
+                    <i class="bi bi-plus"></i> 添加培训计划
+                </a>
+                <a href="{{ url_for('training.training_statistics') }}" class="btn btn-primary">
+                    <i class="bi bi-bar-chart"></i> 培训统计
+                </a>
+            </div>
+            
+            <!-- 搜索和筛选 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{{ url_for('training.training_plan_index') }}">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">状态</label>
+                                <select name="status" id="status" class="form-select">
+                                    <option value="">所有状态</option>
+                                    <option value="planned" {% if selected_status == 'planned' %}selected{% endif %}>计划中</option>
+                                    <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>进行中</option>
+                                    <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>已完成</option>
+                                    <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>已取消</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="keyword" class="form-label">关键词搜索</label>
+                                <input type="text" name="keyword" id="keyword" class="form-control" value="{{ keyword or '' }}" placeholder="搜索培训主题、讲师等">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">搜索</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 培训计划列表 -->
+            {% if training_plans %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>培训主题</th>
+                            <th>讲师</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>地点</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in training_plans %}
+                            <tr>
+                                <td>{{ plan.title }}</td>
+                                <td>{{ plan.trainer }}</td>
+                                <td>{{ plan.start_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ plan.end_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ plan.location }}</td>
+                                <td>
+                                    {% if plan.status == 'planned' %}
+                                        <span class="badge bg-warning">计划中</span>
+                                    {% elif plan.status == 'in_progress' %}
+                                        <span class="badge bg-info">进行中</span>
+                                    {% elif plan.status == 'completed' %}
+                                        <span class="badge bg-success">已完成</span>
+                                    {% elif plan.status == 'cancelled' %}
+                                        <span class="badge bg-danger">已取消</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ plan.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('training.training_plan_detail', id=plan.id) }}" class="btn btn-info btn-sm me-1">查看</a>
+                                    <a href="{{ url_for('training.edit_training_plan', id=plan.id) }}" class="btn btn-warning btn-sm me-1">编辑</a>
+                                    <form action="{{ url_for('training.delete_training_plan', id=plan.id) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个培训计划吗？')">删除</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- 分页 -->
+                {% if pagination %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('training.training_plan_index', page=pagination.prev_num, status=selected_status, keyword=keyword) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if pagination.page == page_num %}
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('training.training_plan_index', page=page_num, status=selected_status, keyword=keyword) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('training.training_plan_index', page=pagination.next_num, status=selected_status, keyword=keyword) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    暂无培训计划
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

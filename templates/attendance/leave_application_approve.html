@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">审批请假申请</h1>
+        <a href="{{ url_for('attendance.leave_application_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 请假申请详情 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">请假申请详情</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>申请ID：</strong>{{ application.id }}</p>
+                    <p><strong>员工：</strong>{{ application.employee.employee_id }} - {{ application.employee.name }}</p>
+                    <p><strong>请假类型：</strong>{{ application.leave_type }}</p>
+                    <p><strong>开始日期：</strong>{{ application.start_date.strftime('%Y-%m-%d') }}</p>
+                    <p><strong>结束日期：</strong>{{ application.end_date.strftime('%Y-%m-%d') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>时长（天）：</strong>{{ application.duration }}</p>
+                    <p><strong>提交时间：</strong>{{ application.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p><strong>当前状态：</strong>
+                        <span class="badge badge-{{ 'primary' if application.status == 'pending' else 'success' if application.status == 'approved' else 'danger' }}">
+                            {{ '待审批' if application.status == 'pending' else '已批准' if application.status == 'approved' else '已拒绝' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <p><strong>请假原因：</strong></p>
+            <p>{{ application.reason }}</p>
+        </div>
+    </div>
+
+    <!-- 审批表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">审批操作</h6>
+        </div>
+        <div class="card-body">
+            <form action="" method="post">
+                <div class="form-group">
+                    <label for="comments">审批意见</label>
+                    <textarea class="form-control" id="comments" name="comments" rows="4"></textarea>
+                </div>
+                <div class="mt-4 text-center">
+                    <button type="submit" name="action" value="approve" class="btn btn-success btn-lg mr-2">
+                        <i class="fas fa-check mr-2"></i> 批准
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg">
+                        <i class="fas fa-times mr-2"></i> 拒绝
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

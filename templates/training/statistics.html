@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}培训统计分析{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">培训统计分析</h1>
+            
+            <!-- 返回按钮 -->
+            <div class="mb-4">
+                <a href="{{ url_for('training.training_plan_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回计划列表
+                </a>
+            </div>
+            
+            <!-- 统计卡片 -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">总培训计划数</h5>
+                            <p class="card-text display-4">{{ total_plans }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">总参与人数</h5>
+                            <p class="card-text display-4">{{ total_participants }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h5 class="card-title">出勤率</h5>
+                            <p class="card-text display-4">{{ "%.1f%%"|format(attendance_rate) }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">总证书数</h5>
+                            <p class="card-text display-4">{{ total_certificates }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 图表区域 -->
+            <div class="row">
+                <!-- 培训状态分布 -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">培训状态分布</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 培训评估统计 -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">培训评估统计</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="evaluationChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 培训评估详情 -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">培训评估详情</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>评估项</th>
+                                <th>平均分数</th>
+                                <th>评级</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>内容相关性</td>
+                                <td>{{ "%.1f"|format(avg_content_relevance) }}/5</td>
+                                <td>
+                                    {% if avg_content_relevance >= 4.5 %}
+                                        <span class="badge bg-primary">优秀</span>
+                                    {% elif avg_content_relevance >= 3.5 %}
+                                        <span class="badge bg-success">良好</span>
+                                    {% elif avg_content_relevance >= 2.5 %}
+                                        <span class="badge bg-info">一般</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">差</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>讲师效果</td>
+                                <td>{{ "%.1f"|format(avg_trainer_effectiveness) }}/5</td>
+                                <td>
+                                    {% if avg_trainer_effectiveness >= 4.5 %}
+                                        <span class="badge bg-primary">优秀</span>
+                                    {% elif avg_trainer_effectiveness >= 3.5 %}
+                                        <span class="badge bg-success">良好</span>
+                                    {% elif avg_trainer_effectiveness >= 2.5 %}
+                                        <span class="badge bg-info">一般</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">差</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>总体满意度</td>
+                                <td>{{ "%.1f"|format(avg_overall_satisfaction) }}/5</td>
+                                <td>
+                                    {% if avg_overall_satisfaction >= 4.5 %}
+                                        <span class="badge bg-primary">优秀</span>
+                                    {% elif avg_overall_satisfaction >= 3.5 %}
+                                        <span class="badge bg-success">良好</span>
+                                    {% elif avg_overall_satisfaction >= 2.5 %}
+                                        <span class="badge bg-info">一般</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">差</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 培训状态分布图表
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['计划中', '进行中', '已完成', '已取消'],
+                datasets: [{
+                    data: [{{ status_count_dict['planned'] }}, {{ status_count_dict['in_progress'] }}, {{ status_count_dict['completed'] }}, {{ status_count_dict['cancelled'] }}],
+                    backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545'],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // 培训评估统计图表
+        const evaluationCtx = document.getElementById('evaluationChart').getContext('2d');
+        const evaluationChart = new Chart(evaluationCtx, {
+            type: 'bar',
+            data: {
+                labels: ['内容相关性', '讲师效果', '总体满意度'],
+                datasets: [{
+                    label: '平均分数',
+                    data: [{{ "%.1f"|format(avg_content_relevance) }}, {{ "%.1f"|format(avg_trainer_effectiveness) }}, {{ "%.1f"|format(avg_overall_satisfaction) }}],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5,
+                        title: {
+                            display: true,
+                            text: '平均分数（1-5）'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '评估项'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

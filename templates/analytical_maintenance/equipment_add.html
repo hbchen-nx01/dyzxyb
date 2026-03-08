@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}添加仪表{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加仪表</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('analytical_maintenance.equipment_add') }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="equipment_number" class="form-label">设备位号</label>
+                                <input type="text" class="form-control" id="equipment_number" name="equipment_number" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">仪表名称</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="model" class="form-label">型号</label>
+                                <input type="text" class="form-control" id="model" name="model">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="specification" class="form-label">规格</label>
+                                <input type="text" class="form-control" id="specification" name="specification">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location" class="form-label">安装位置</label>
+                                <input type="text" class="form-control" id="location" name="location">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="measurement_parameter" class="form-label">测量参数/介质</label>
+                                <input type="text" class="form-control" id="measurement_parameter" name="measurement_parameter">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="serial_number" class="form-label">出厂编号</label>
+                                <input type="text" class="form-control" id="serial_number" name="serial_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="purchase_date" class="form-label">安装日期</label>
+                                <input type="date" class="form-control" id="purchase_date" name="purchase_date">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="responsible_person" class="form-label">维护责任人</label>
+                                <input type="text" class="form-control" id="responsible_person" name="responsible_person">
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">保存</button>
+                                <a href="{{ url_for('analytical_maintenance.equipment_index') }}" class="btn btn-secondary">取消</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

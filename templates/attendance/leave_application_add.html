@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">提交请假申请</h1>
+        <a href="{{ url_for('attendance.leave_application_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 请假申请表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">请假申请信息</h6>
+        </div>
+        <div class="card-body">
+            <form action="" method="post" enctype="multipart/form-data">
+                <div class="form-row">
+                    <!-- 员工选择 -->
+                    <div class="form-group col-md-6">
+                        <label for="employee_id">员工</label>
+                        <select class="form-control" id="employee_id" name="employee_id" required>
+                            <option value="">请选择员工</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.employee_id }} - {{ employee.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- 请假类型 -->
+                    <div class="form-group col-md-6">
+                        <label for="leave_type">请假类型</label>
+                        <select class="form-control" id="leave_type" name="leave_type" required>
+                            <option value="年">年假</option>
+                            <option value="病">病假</option>
+                            <option value="事">事假</option>
+                            <option value="产">产假</option>
+                            <option value="婚">婚假</option>
+                            <option value="丧">丧假</option>
+                            <option value="抚">抚恤假</option>
+                            <option value="探">探亲假</option>
+                            <option value="育">育儿假</option>
+                            <option value="伤">工伤假</option>
+                            <option value="护">护理假</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <!-- 开始日期 -->
+                    <div class="form-group col-md-6">
+                        <label for="start_date">开始日期</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    
+                    <!-- 结束日期 -->
+                    <div class="form-group col-md-6">
+                        <label for="end_date">结束日期</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <!-- 开始时间（半天假） -->
+                    <div class="form-group col-md-6">
+                        <label for="start_time">开始时间（半天假使用）</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time">
+                    </div>
+                    
+                    <!-- 结束时间（半天假） -->
+                    <div class="form-group col-md-6">
+                        <label for="end_time">结束时间（半天假使用）</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <!-- 请假时长 -->
+                    <div class="form-group col-md-6">
+                        <label for="duration">请假时长（天）</label>
+                        <input type="number" step="0.5" class="form-control" id="duration" name="duration" required min="0.5" max="365">
+                    </div>
+                </div>
+                
+                <!-- 请假原因 -->
+                <div class="form-group">
+                    <label for="reason">请假原因</label>
+                    <textarea class="form-control" id="reason" name="reason" rows="4" required></textarea>
+                </div>
+                
+                <!-- 图片上传 -->
+                <div class="form-group">
+                    <label for="attachment">请假证明图片</label>
+                    <input type="file" class="form-control-file" id="attachment" name="attachment" accept="image/*">
+                    <small class="form-text text-muted">支持上传JPG、PNG、GIF格式图片，最大16MB</small>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane mr-2"></i> 提交申请
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

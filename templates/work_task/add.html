@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}添加工作任务{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4 text-center">添加工作任务</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ url_for('work_task.add_work_task') }}" method="post">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">任务标题 *</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">任务描述</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="assigned_type" class="form-label">分配类型 *</label>
+                            <select class="form-select" id="assigned_type" name="assigned_type" required>
+                                <option value="employee">班组人员</option>
+                                <option value="contractor">承包商</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 班组人员选择 -->
+                        <div class="mb-3" id="employee-select">
+                            <label for="employee_id" class="form-label">选择人员 *</label>
+                            <select class="form-select" id="employee_id" name="employee_id" required>
+                                <option value="">请选择人员</option>
+                                {% for employee in employees %}
+                                    <option value="{{ employee.name }}">{{ employee.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- 承包商输入 -->
+                        <div class="mb-3" id="contractor-input" style="display: none;">
+                            <label for="assigned_to" class="form-label">承包商名称 *</label>
+                            <input type="text" class="form-control" id="assigned_to" name="assigned_to">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">任务状态</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="pending">未开始</option>
+                                <option value="in_progress">进行中</option>
+                                <option value="completed">已完成</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('work_task.work_task_index') }}" class="btn btn-secondary">取消</a>
+                            <button type="submit" class="btn btn-primary">添加任务</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 监听分配类型变化，显示或隐藏对应的选择框
+        document.getElementById('assigned_type').addEventListener('change', function() {
+            const employeeSelect = document.getElementById('employee-select');
+            const contractorInput = document.getElementById('contractor-input');
+            const employeeIdSelect = document.getElementById('employee_id');
+            const contractorNameInput = document.getElementById('assigned_to');
+            
+            if (this.value === 'employee') {
+                employeeSelect.style.display = 'block';
+                contractorInput.style.display = 'none';
+                employeeIdSelect.setAttribute('required', 'required');
+                contractorNameInput.removeAttribute('required');
+            } else {
+                employeeSelect.style.display = 'none';
+                contractorInput.style.display = 'block';
+                employeeIdSelect.removeAttribute('required');
+                contractorNameInput.setAttribute('required', 'required');
+            }
+        });
+    </script>
+{% endblock %}

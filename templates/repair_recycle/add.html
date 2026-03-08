@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}添加修旧利废记录{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加修旧利废记录</h1>
+            
+            <!-- 添加记录表单 -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('repair_recycle.add_repair_recycle') }}" enctype="multipart/form-data">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="equipment_name" class="form-label">设备 <span class="text-danger">*</span></label>
+                                <input type="text" name="equipment_name" id="equipment_name" class="form-control" required placeholder="请输入设备名称或编号">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="project_name" class="form-label">项目名称 <span class="text-danger">*</span></label>
+                                <input type="text" name="project_name" id="project_name" class="form-control" required placeholder="修旧利废项目名称">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="repair_date" class="form-label">修复日期 <span class="text-danger">*</span></label>
+                                <input type="date" name="repair_date" id="repair_date" class="form-control" required value="{{ today }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="repair_person" class="form-label">修复人员 <span class="text-danger">*</span></label>
+                                <input type="text" name="repair_person" id="repair_person" class="form-control" required placeholder="修复人员姓名">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="before_value" class="form-label">修复前价值（元） <span class="text-danger">*</span></label>
+                                <input type="number" name="before_value" id="before_value" class="form-control" required step="0.01" placeholder="修复前设备或部件的价值">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="after_value" class="form-label">修复后价值（元） <span class="text-danger">*</span></label>
+                                <input type="number" name="after_value" id="after_value" class="form-control" required step="0.01" placeholder="修复后设备或部件的价值">
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="before_status" class="form-label">修复前状态 <span class="text-danger">*</span></label>
+                                <textarea name="before_status" id="before_status" class="form-control" rows="3" required placeholder="详细描述修复前的设备或部件状态，包括故障、损坏情况等"></textarea>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="after_status" class="form-label">修复后状态 <span class="text-danger">*</span></label>
+                                <textarea name="after_status" id="after_status" class="form-control" rows="3" required placeholder="详细描述修复后的设备或部件状态，包括修复效果、功能恢复情况等"></textarea>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="before_image" class="form-label">修复前图片</label>
+                                <input type="file" name="before_image" id="before_image" class="form-control" accept="image/*">
+                                <div class="form-text">支持上传PNG、JPG、JPEG、GIF格式的图片</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="after_image" class="form-label">修复后图片</label>
+                                <input type="file" name="after_image" id="after_image" class="form-control" accept="image/*">
+                                <div class="form-text">支持上传PNG、JPG、JPEG、GIF格式的图片</div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="description" class="form-label">项目描述</label>
+                                <textarea name="description" id="description" class="form-control" rows="3" placeholder="可以添加项目的额外说明、修复过程等详细信息"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex justify-content-end">
+                            <a href="{{ url_for('repair_recycle.repair_recycle_index') }}" class="btn btn-secondary me-2">取消</a>
+                            <button type="submit" class="btn btn-primary">保存记录</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 设置默认日期为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('repair_date').value = today;
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}故障记录详情{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">故障记录详情</h1>
+            
+            <!-- 故障基本信息 -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">故障基本信息</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>设备：</strong>{{ fault_record.equipment.name }}</p>
+                            <p><strong>故障现象：</strong>{{ fault_record.fault_phenomenon }}</p>
+                            <p><strong>发生时间：</strong>{{ fault_record.occurrence_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>报告人：</strong>{{ fault_record.reporter }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>故障类型：</strong>{{ fault_record.fault_type or '未分类' }}</p>
+                            <p><strong>状态：</strong>
+                                {% if fault_record.status == 'reported' %}
+                                    <span class="badge bg-warning">已报告</span>
+                                {% elif fault_record.status == 'in_progress' %}
+                                    <span class="badge bg-info">处理中</span>
+                                {% elif fault_record.status == 'resolved' %}
+                                    <span class="badge bg-success">已解决</span>
+                                {% elif fault_record.status == 'closed' %}
+                                    <span class="badge bg-secondary">已关闭</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>创建时间：</strong>{{ fault_record.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>最后更新：</strong>{{ fault_record.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 故障图片 -->
+                    {% if fault_record.fault_image %}
+                        <div class="mt-4">
+                            <p><strong>故障图片：</strong></p>
+                            <img src="{{ url_for('static', filename='uploads/' + fault_record.fault_image) }}" alt="故障图片" class="img-fluid rounded" style="max-width: 100%; height: auto; max-height: 500px;">
+                        </div>
+                    {% endif %}
+                    
+                    <!-- 操作按钮 -->
+                    <div class="mt-4">
+                        <a href="{{ url_for('fault_handling.edit_fault_record', id=fault_record.id) }}" class="btn btn-warning btn-sm me-2">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </a>
+                        <a href="{{ url_for('fault_handling.add_fault_solution', fault_id=fault_record.id) }}" class="btn btn-success btn-sm me-2">
+                            <i class="bi bi-tools"></i> 添加解决方案
+                        </a>
+                        {% if fault_record.status != 'closed' %}
+                            <form action="{{ url_for('fault_handling.close_fault_record', id=fault_record.id) }}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('确定要关闭这条故障记录吗？')">
+                                    <i class="bi bi-x-circle"></i> 关闭记录
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 解决方案列表 -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">解决方案列表</h5>
+                </div>
+                <div class="card-body">
+                    {% if solutions %}
+                        <div class="accordion" id="solutionsAccordion">
+                            {% for solution in solutions %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="solutionHeading{{ solution.id }}">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#solutionCollapse{{ solution.id }}" aria-expanded="true" aria-controls="solutionCollapse{{ solution.id }}">
+                                            解决方案 #{{ loop.index }} - {{ solution.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </button>
+                                    </h2>
+                                    <div id="solutionCollapse{{ solution.id }}" class="accordion-collapse collapse show" aria-labelledby="solutionHeading{{ solution.id }}" data-bs-parent="#solutionsAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <p><strong>处理人：</strong>{{ solution.handler }}</p>
+                                                    <p><strong>开始处理时间：</strong>{{ solution.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                                                    <p><strong>结束处理时间：</strong>{{ solution.end_time.strftime('%Y-%m-%d %H:%M') if solution.end_time else '未结束' }}</p>
+                                                    <p><strong>处理时长：</strong>{{ "%.2f小时"|format(solution.handling_duration) if solution.handling_duration else '处理中' }}</p>
+                                                    <p><strong>验证结果：</strong>
+                                                        {% if solution.verification_result == 'passed' %}
+                                                            <span class="badge bg-success">通过</span>
+                                                        {% elif solution.verification_result == 'failed' %}
+                                                            <span class="badge bg-danger">失败</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">未验证</span>
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p><strong>处理过程：</strong></p>
+                                                    <p>{{ solution.process_description or '未记录处理过程' }}</p>
+                                                    <p><strong>解决方案：</strong></p>
+                                                    <p>{{ solution.solution }}</p>
+                                                    {% if solution.notes %}
+                                                        <p><strong>备注：</strong></p>
+                                                        <p>{{ solution.notes }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            暂无解决方案
+                            <a href="{{ url_for('fault_handling.add_fault_solution', fault_id=fault_record.id) }}" class="btn btn-sm btn-success ms-2">添加解决方案</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 返回按钮 -->
+            <div class="mt-4">
+                <a href="{{ url_for('fault_handling.fault_record_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> 返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

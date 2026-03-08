@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}添加故障解决方案 - 仪表维护{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>添加故障解决方案</h2>
+    <h4 class="text-muted mb-4">仪表：{{ fault.equipment.name }} - 故障：{{ fault.fault_phenomenon[:50] }}...</h4>
+    
+    <form method="POST" action="{{ url_for('analytical_maintenance.fault_solution_add', fault_id=fault.id) }}">
+        <div class="row">
+            <!-- 左侧表单 -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="handler" class="form-label">处理人</label>
+                    <input type="text" class="form-control" id="handler" name="handler" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="start_time" class="form-label">开始处理时间</label>
+                    <input type="datetime-local" class="form-control" id="start_time" name="start_time" required value="{{ now.strftime('%Y-%m-%dT%H:%M') }}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="end_time" class="form-label">结束处理时间</label>
+                    <input type="datetime-local" class="form-control" id="end_time" name="end_time" required value="{{ now.strftime('%Y-%m-%dT%H:%M') }}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="verification_result" class="form-label">验证结果</label>
+                    <select class="form-select" id="verification_result" name="verification_result" required>
+                        <option value="">请选择验证结果</option>
+                        <option value="passed">通过</option>
+                        <option value="failed">失败</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 右侧表单 -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="process_description" class="form-label">处理过程</label>
+                    <textarea class="form-control" id="process_description" name="process_description" rows="3"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="solution" class="form-label">解决方案</label>
+                    <textarea class="form-control" id="solution" name="solution" rows="3" required></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="spare_parts_used" class="form-label">使用备件</label>
+                    <input type="text" class="form-control" id="spare_parts_used" name="spare_parts_used">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="repair_cost" class="form-label">维修成本（元）</label>
+                    <input type="number" step="0.01" class="form-control" id="repair_cost" name="repair_cost">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 备注 -->
+        <div class="mb-3">
+            <label for="notes" class="form-label">备注</label>
+            <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+        </div>
+        
+        <!-- 表单按钮 -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary me-2">保存解决方案</button>
+            <a href="{{ url_for('analytical_maintenance.fault_detail', id=fault.id) }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

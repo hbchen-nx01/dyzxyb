@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 页面标题 -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">添加节假日</h1>
+        <a href="{{ url_for('attendance.holiday_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i> 返回列表
+        </a>
+    </div>
+
+    <!-- 添加节假日表单 -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">节假日信息</h6>
+        </div>
+        <div class="card-body">
+            <form action="" method="post">
+                <div class="form-row">
+                    <!-- 节假日日期 -->
+                    <div class="form-group col-md-6">
+                        <label for="holiday_date">节假日日期</label>
+                        <input type="date" class="form-control" id="holiday_date" name="holiday_date" required>
+                    </div>
+                    
+                    <!-- 节假日名称 -->
+                    <div class="form-group col-md-6">
+                        <label for="name">节假日名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required placeholder="例如：春节">
+                    </div>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save mr-2"></i> 保存节假日
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

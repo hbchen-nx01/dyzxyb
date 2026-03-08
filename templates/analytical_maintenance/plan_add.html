@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}添加维护计划{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">添加维护计划</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="equipment_id" class="form-label">设备名称</label>
+                                <select class="form-select" id="equipment_id" name="equipment_id" required>
+                                    <option value="">请选择设备</option>
+                                    {% for equipment in equipments %}
+                                        <option value="{{ equipment.id }}">{{ equipment.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="plan_name" class="form-label">计划名称</label>
+                                <input type="text" class="form-control" id="plan_name" name="plan_name" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="description" class="form-label">计划描述</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="maintenance_type" class="form-label">维护类型</label>
+                                <select class="form-select" id="maintenance_type" name="maintenance_type" required>
+                                    <option value="">请选择维护类型</option>
+                                    <option value="日常维护">日常维护（每日）</option>
+                                    <option value="周维护">周维护（每周）</option>
+                                    <option value="月维护">月维护（每月）</option>
+                                    <option value="季度维护">季度维护（每季度）</option>
+                                    <option value="年度维护">年度维护（每年）</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="frequency" class="form-label">维护频率</label>
+                                <select class="form-select" id="frequency" name="frequency" required>
+                                    <option value="">请选择维护频率</option>
+                                    <option value="daily">每日</option>
+                                    <option value="weekly">每周</option>
+                                    <option value="monthly">每月</option>
+                                    <option value="quarterly">每季度</option>
+                                    <option value="yearly">每年</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="next_maintenance_date" class="form-label">下次维护日期</label>
+                                <input type="date" class="form-control" id="next_maintenance_date" name="next_maintenance_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="created_by" class="form-label">创建人</label>
+                                <input type="text" class="form-control" id="created_by" name="created_by" required>
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">保存</button>
+                                <a href="{{ url_for('analytical_maintenance.plan_index') }}" class="btn btn-secondary">取消</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
